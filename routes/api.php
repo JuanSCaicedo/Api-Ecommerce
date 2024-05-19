@@ -26,6 +26,7 @@ Route::group([
 
 ], function ($router) {
     Route::post('/register', [AuthController::class, 'register'])->name('register');
+    Route::post('/verified_auth', [AuthController::class, 'verified_auth'])->name('verified_auth');
     Route::post('/login', [AuthController::class, 'login'])->name('login');
     Route::post('/login_ecommerce', [AuthController::class, 'login_ecommerce'])->name('login_ecommerce');
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');

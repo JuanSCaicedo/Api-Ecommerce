@@ -20,7 +20,7 @@ class AuthController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('auth:api', ['except' => ['login', 'register', 'login_ecommerce']]);
+        $this->middleware('auth:api', ['except' => ['login', 'register', 'login_ecommerce', 'verified_auth']]);
     }
 
 
@@ -90,7 +90,22 @@ class AuthController extends Controller
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
+        if(!auth('api')->user()->email_verified_at) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+
         return $this->respondWithToken($token);
+    }
+
+    public function verified_auth(Request $request) {
+        $user = User::where("uniqd", $request->code_user)->first();
+
+        if($user) {
+            $user->update(["email_verified_at" => now()]);
+            return response()->json(["message" => 200]);
+        }
+
+        return response()->json(["message" => 403]);
     }
 
     /**
