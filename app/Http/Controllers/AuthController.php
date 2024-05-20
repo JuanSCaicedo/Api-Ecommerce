@@ -11,6 +11,7 @@ use App\Mail\ForgotPasswordMail;
 use App\Models\User;
 use Illuminate\Support\Facades\Mail;
 use Validator;
+use Carbon\Carbon;
 
 class AuthController extends Controller
 {
@@ -73,7 +74,11 @@ class AuthController extends Controller
         $user = User::where("email", $request->email)->first();
 
         if ($user) {
-            $user->update(["code_verified" => uniqid()]);
+            $code = uniqid();
+            $user->update([
+                "code_verified" => $code,
+                "code_expires_at" => Carbon::now()->addMinutes(60) // Guarda la fecha y hora actual mas 60 mnts
+            ]);
             Mail::to(request()->email)->send(new ForgotPasswordMail($user));
             return response()->json(['message' => 200]);
         } else {
@@ -83,9 +88,12 @@ class AuthController extends Controller
     public function verified_code(Request $request)
     {
         $user = User::where("code_verified", $request->code)->first();
-
+    
         if ($user) {
-
+            // Verificar si la fecha de expiración ha pasado
+            if ($user->code_expires_at && Carbon::now()->gt($user->code_expires_at)) {
+                return response()->json(['message' => 401]);
+            }
             return response()->json(['message' => 200]);
         } else {
             return response()->json(['message' => 403]);
@@ -94,11 +102,11 @@ class AuthController extends Controller
     public function new_password(Request $request)
     {
         $user = User::where("code_verified", $request->code)->first();
-        $user->update(["password" => bcrypt(request()->password), "code_verified" => null]);
-        return response()->json(['message' => 200]);
+        if ($user) {
+            $user->update(["password" => bcrypt(request()->password), "code_verified" => null]);
+            return response()->json(['message' => 200]);
+        }
     }
-
-
     /**
      * Get a JWT via given credentials.
      *
@@ -175,10 +183,10 @@ class AuthController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function refresh()
-    {
-        return $this->respondWithToken(auth('api')->refresh());
-    }
+    // public function refresh()
+    // {
+    //     return $this->respondWithToken(auth('api')->refresh());
+    // }
 
     /**
      * Get the token array structure.
@@ -187,16 +195,16 @@ class AuthController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    protected function respondWithToken($token)
-    {
-        return response()->json([
-            'access_token' => $token,
-            'token_type' => 'bearer',
-            'expires_in' => auth('api')->factory()->getTTL() * 60,
-            "user" => [
-                "full_name" => auth('api')->user()->name . ' ' . auth('api')->user()->surname,
-                "email" => auth('api')->user()->email,
-            ],
-        ]);
-    }
+    // protected function respondWithToken($token)
+    // {
+    //     return response()->json([
+    //         'access_token' => $token,
+    //         'token_type' => 'bearer',
+    //         'expires_in' => auth('api')->factory()->getTTL() * 60,
+    //         "user" => [
+    //             "full_name" => auth('api')->user()->name . ' ' . auth('api')->user()->surname,
+    //             "email" => auth('api')->user()->email,
+    //         ],
+    //     ]);
+    // }
 }
