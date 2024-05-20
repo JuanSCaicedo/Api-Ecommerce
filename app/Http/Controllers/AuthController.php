@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
+use App\Mail\ForgotPasswordMail;
 use App\Models\User;
 use Illuminate\Support\Facades\Mail;
 use Validator;
@@ -20,7 +21,15 @@ class AuthController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('auth:api', ['except' => ['login', 'register', 'login_ecommerce', 'verified_auth']]);
+        $this->middleware('auth:api', ['except' => [
+            'login',
+            'register',
+            'login_ecommerce',
+            'verified_auth',
+            'verified_email',
+            'verified_code',
+            'new_password'
+        ]]);
     }
 
 
@@ -65,7 +74,7 @@ class AuthController extends Controller
 
         if ($user) {
             $user->update(["code_verified" => uniqid()]);
-            Mail::to(request()->email)->send(new verifiedMail($user));
+            Mail::to(request()->email)->send(new ForgotPasswordMail($user));
             return response()->json(['message' => 200]);
         } else {
             return response()->json(['message' => 403]);
