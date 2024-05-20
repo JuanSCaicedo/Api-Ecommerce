@@ -59,6 +59,36 @@ class AuthController extends Controller
         return response()->json($user, 201);
     }
 
+    public function verified_email(Request $request)
+    {
+        $user = User::where("email", $request->email)->first();
+
+        if ($user) {
+            $user->update(["code_verified" => uniqid()]);
+            Mail::to(request()->email)->send(new verifiedMail($user));
+            return response()->json(['message' => 200]);
+        } else {
+            return response()->json(['message' => 403]);
+        }
+    }
+    public function verified_code(Request $request)
+    {
+        $user = User::where("code_verified", $request->code)->first();
+
+        if ($user) {
+
+            return response()->json(['message' => 200]);
+        } else {
+            return response()->json(['message' => 403]);
+        }
+    }
+    public function new_password(Request $request)
+    {
+        $user = User::where("code_verified", $request->code)->first();
+        $user->update(["password" => bcrypt(request()->password), "code_verified" => null]);
+        return response()->json(['message' => 200]);
+    }
+
 
     /**
      * Get a JWT via given credentials.
@@ -90,18 +120,19 @@ class AuthController extends Controller
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
-        if(!auth('api')->user()->email_verified_at) {
+        if (!auth('api')->user()->email_verified_at) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
         return $this->respondWithToken($token);
     }
 
-    public function verified_auth(Request $request) {
+    public function verified_auth(Request $request)
+    {
         $user = User::where("uniqd", $request->code_user)->first();
 
-        if($user) {
-            $user->update(["email_verified_at" => now()]);
+        if ($user) {
+            $user->update(["email_verified_at" => now(), "uniqd" => null]);
             return response()->json(["message" => 200]);
         }
 
