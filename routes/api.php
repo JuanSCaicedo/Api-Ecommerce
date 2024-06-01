@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\Product\CategorieController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
@@ -35,4 +36,11 @@ Route::group([
     Route::post('/verified_email', [AuthController::class, 'verified_email'])->name('verified_email');
     Route::post('/verified_code', [AuthController::class, 'verified_code'])->name('verified_code');
     Route::post('/new_password', [AuthController::class, 'new_password'])->name('new_password');
+});
+
+Route::group([
+    'middleware' => 'auth:api',
+    'prefix' => 'admin'
+], function ($router) {
+    Route::resource("categories", CategorieController::class);
 });
