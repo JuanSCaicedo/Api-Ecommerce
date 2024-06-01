@@ -3,16 +3,27 @@
 namespace App\Http\Controllers\Admin\Product;
 
 use App\Http\Controllers\Controller;
+use App\Models\Product\Categorie;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class CategorieController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        $search = $request->search;
+
+        $categories = Categorie::where('name', 'LIKE', "%" . $search . "%")
+            ->orderBy('id', 'desc')
+            ->paginate(25);
+
+        return response()->json([
+            'total' => $categories->total(),
+            'categories' => $categories
+        ]);
     }
 
     /**
@@ -20,7 +31,20 @@ class CategorieController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $is_exists = Categorie::where("name", $request->name)->first();
+
+        if ($is_exists) {
+            return response()->json(["message" => 403]);
+        }
+
+        if ($request->hasFile('image')) {
+            $path = Storage::putFile("categories", $request->file('image'));
+            $request->request->add(['image' => $path]);
+        }
+
+        $categorie = Categorie::create($request->all());
+
+        return response()->json(["message" => 200]);
     }
 
     /**
@@ -28,7 +52,9 @@ class CategorieController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $categorie = Categorie::findOrFail($id);
+
+        return response()->json(["categorie" => $categorie]);
     }
 
     /**
@@ -36,7 +62,25 @@ class CategorieController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $is_exists = Categorie::where("id", '<>', $id)->where("name", $request->name)->first();
+
+        if ($is_exists) {
+            return response()->json(["message" => 403]);
+        }
+
+        $categorie = Categorie::findOrFail($id);
+
+        if ($request->hasFile('image')) {
+            if ($categorie->image) {
+                Storage::delete($categorie->image);
+            }
+            $path = Storage::putFile("categories", $request->file('image'));
+            $request->request->add(['image' => $path]);
+        }
+
+        $request->update($request->all());
+
+        return response()->json(["message" => 200]);
     }
 
     /**
@@ -44,6 +88,11 @@ class CategorieController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $categorie = Categorie::findOrFail($id);
+        $categorie->delete();
+
+        //Validar que la categoria no esté en ningun producto
+
+        return response()->json(["message" => 200]);
     }
 }
