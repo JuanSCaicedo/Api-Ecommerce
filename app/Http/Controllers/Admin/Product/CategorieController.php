@@ -20,7 +20,7 @@ class CategorieController extends Controller
 
         $categories = Categorie::where('name', 'LIKE', "%" . $search . "%")
             ->orderBy('id', 'desc')
-            ->paginate(25);
+            ->paginate(10);
 
         return response()->json([
             'total' => $categories->total(),
