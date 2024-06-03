@@ -30,12 +30,13 @@ class CategorieController extends Controller
 
     public function config()
     {
-        $categories_first = Categorie::where('categorie_second_id', null)->where('categorie_third_id', null)->get();
-        $categories_seconds = Categorie::where('categorie_second_id','<>', null)->where('categorie_third_id', null)->get();
+
+        $categories_first = Categorie::where("categorie_second_id", NULL)->where("categorie_third_id", NULL)->get();
+        $categories_seconds = Categorie::where("categorie_second_id", "<>", NULL)->where("categorie_third_id", NULL)->get();
 
         return response()->json([
-            'categories_first' => $categories_first,
-            'categories_seconds' => $categories_seconds,
+            "categories_first" => $categories_first,
+            "categories_seconds" => $categories_seconds,
         ]);
     }
 
@@ -44,19 +45,15 @@ class CategorieController extends Controller
      */
     public function store(Request $request)
     {
-        $is_exists = Categorie::where("name", $request->name)->first();
-
-        if ($is_exists) {
+        $is_exists = Categorie::where("name",$request->name)->first();
+        if($is_exists){
             return response()->json(["message" => 403]);
         }
-
-        if ($request->hasFile('image')) {
-            $path = Storage::putFile("categories", $request->file('image'));
-            $request->request->add(['image' => $path]);
+        if($request->hasFile("image")){
+            $path = Storage::putFile("categories",$request->file("image"));
+            $request->request->add(["imagen" =>  $path]);
         }
-
         $categorie = Categorie::create($request->all());
-
         return response()->json(["message" => 200]);
     }
 
