@@ -15,21 +15,25 @@ class CategorieResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id' => $this->resource->id,
-            'name' => $this->resource->name,
-            'icon' => $this->resource->icon,
-            'imagen' => $this->resource->imagen ? env("APP_URL") . "storage/" . $this->resource->imagen : null,
-            'categorie_second_id' => $this->resource->categorie_second_id,
-            'categorie_second' => $this->resource->categorie_second ? [
+            "id" => $this->resource->id,
+            "name" => $this->resource->name,
+            "icon" => $this->resource->icon,
+            "imagen" => $this->resource->imagen ? env("APP_URL")."storage/".$this->resource->imagen : NULL,
+
+            "categorie_second_id" => $this->resource->categorie_second_id,
+            "categorie_second" => $this->resource->categorie_second ? [
                 "name" => $this->resource->categorie_second->name,
-            ] : null,
-            'categorie_third_id' => $this->resource->categorie_third_id,
-            'categorie_third' => $this->resource->categorie_third ? [
+            ] : NULL,
+
+            "categorie_third_id" => $this->resource->categorie_third_id,
+            "categorie_third" => $this->resource->categorie_third ? [
                 "name" => $this->resource->categorie_third->name,
-            ] : null,
-            'position' => $this->resource->position,
-            'type_categorie' => $this->resource->type_categorie,
-            'created_at' => $this->resource->created_at->format('Y-m-d H:i:s'),
+            ] : NULL,
+
+            "position" => $this->resource->position,
+            "type_categorie" => $this->resource->type_categorie,
+            "state" => $this->resource->state,
+            "created_at" => $this->resource->created_at->format("Y-m-d h:i:s"),
         ];
     }
 }
