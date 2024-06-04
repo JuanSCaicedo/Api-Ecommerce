@@ -45,12 +45,12 @@ class CategorieController extends Controller
      */
     public function store(Request $request)
     {
-        $is_exists = Categorie::where("name",$request->name)->first();
-        if($is_exists){
+        $is_exists = Categorie::where("name", $request->name)->first();
+        if ($is_exists) {
             return response()->json(["message" => 403]);
         }
-        if($request->hasFile("image")){
-            $path = Storage::putFile("categories",$request->file("image"));
+        if ($request->hasFile("image")) {
+            $path = Storage::putFile("categories", $request->file("image"));
             $request->request->add(["imagen" =>  $path]);
         }
         $categorie = Categorie::create($request->all());
@@ -85,7 +85,7 @@ class CategorieController extends Controller
                 Storage::delete($categorie->image);
             }
             $path = Storage::putFile("categories", $request->file('image'));
-            $request->request->add(['image' => $path]);
+            $request->request->add(["imagen" => $path]);
         }
 
         $categorie->update($request->all());
