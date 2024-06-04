@@ -88,7 +88,7 @@ class CategorieController extends Controller
             $request->request->add(['image' => $path]);
         }
 
-        $request->update($request->all());
+        $categorie->update($request->all());
 
         return response()->json(["message" => 200]);
     }
