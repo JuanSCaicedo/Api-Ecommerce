@@ -73,23 +73,26 @@ class CategorieController extends Controller
     public function update(Request $request, string $id)
     {
         $is_exists = Categorie::where("id", '<>', $id)->where("name", $request->name)->first();
-
         if ($is_exists) {
             return response()->json(["message" => 403]);
         }
-
         $categorie = Categorie::findOrFail($id);
-
-        if ($request->hasFile('image')) {
-            if ($categorie->image) {
-                Storage::delete($categorie->image);
+        if ($request->has('image')) {
+            if ($request->image == '') {
+                if ($categorie->imagen) {
+                    Storage::delete($categorie->imagen);
+                    $categorie->imagen = null;
+                    $categorie->save();
+                }
+            } else if ($request->hasFile('image')) {
+                if ($categorie->imagen) {
+                    Storage::delete($categorie->imagen);
+                }
+                $path = Storage::putFile("categories", $request->file('image'));
+                $request->request->add(["imagen" => $path]);
             }
-            $path = Storage::putFile("categories", $request->file('image'));
-            $request->request->add(["imagen" => $path]);
         }
-
         $categorie->update($request->all());
-
         return response()->json(["message" => 200]);
     }
 
