@@ -47,5 +47,7 @@ Route::group([
     Route::resource("categories", CategorieController::class);
     Route::post("categories/{id}", [CategorieController::class, "update"]);
     
+    Route::post("properties", [AttributeProcutController::class, "store_propertie"]);    
+    Route::delete("properties/{id}", [AttributeProcutController::class, "destroy_propertie"]);    
     Route::resource("attributes", AttributeProcutController::class);
 });
