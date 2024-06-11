@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\Product\AttributeProcutController;
 use App\Http\Controllers\Admin\Product\CategorieController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -45,4 +46,6 @@ Route::group([
     Route::get("categories/config", [CategorieController::class, "config"]);
     Route::resource("categories", CategorieController::class);
     Route::post("categories/{id}", [CategorieController::class, "update"]);
+    
+    Route::resource("attributes", AttributeProcutController::class);
 });
