@@ -102,6 +102,12 @@ class CategorieController extends Controller
     public function destroy(string $id)
     {
         $categorie = Categorie::findOrFail($id);
+
+        // Verificar si el slider tiene una imagen y eliminarla si existe
+        if ($categorie->imagen) {
+            Storage::delete($categorie->imagen);
+        }
+
         $categorie->delete();
 
         //Validar que la categoria no esté en ningun producto

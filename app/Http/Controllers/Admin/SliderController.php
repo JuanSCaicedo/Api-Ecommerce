@@ -16,13 +16,13 @@ class SliderController extends Controller
     {
         $search = $request->search;
 
-        $slider = Slider::where('title', 'LIKE', "%" . $search . "%")
+        $sliders = Slider::where('title', 'LIKE', "%" . $search . "%")
             ->orderBy('id', 'desc')
             ->paginate(10);
 
         return response()->json([
-            'total' => $slider->total(),
-            'slider' => $slider->map(function ($slider) {
+            "total" => $sliders->total(),
+            "sliders" => $sliders->map(function ($slider) {
                 return [
                     "id" => $slider->id,
                     "title" => $slider->title,
@@ -30,7 +30,8 @@ class SliderController extends Controller
                     "label" => $slider->label,
                     "imagen" => env("APP_URL") . "storage/" . $slider->imagen,
                     "link" => $slider->link,
-                    "state" => $slider->state
+                    "state" => $slider->state,
+                    "color" => $slider->color,
                 ];
             })
         ]);
@@ -63,7 +64,8 @@ class SliderController extends Controller
             "label" => $slider->label,
             "imagen" => env("APP_URL") . "storage/" . $slider->imagen,
             "link" => $slider->link,
-            "state" => $slider->state
+            "state" => $slider->state,
+            "color" => $slider->color,
         ]]);
     }
 
@@ -98,6 +100,12 @@ class SliderController extends Controller
     public function destroy(string $id)
     {
         $slider = Slider::findOrFail($id);
+
+        // Verificar si el slider tiene una imagen y eliminarla si existe
+        if ($slider->imagen) {
+            Storage::delete($slider->imagen);
+        }
+
         $slider->delete();
 
         return response()->json(["message" => 200]);
