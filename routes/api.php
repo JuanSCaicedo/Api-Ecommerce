@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\Product\AttributeProcutController;
 use App\Http\Controllers\Admin\Product\CategorieController;
+use App\Http\Controllers\Admin\SliderController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
@@ -46,8 +47,11 @@ Route::group([
     Route::get("categories/config", [CategorieController::class, "config"]);
     Route::resource("categories", CategorieController::class);
     Route::post("categories/{id}", [CategorieController::class, "update"]);
-    
-    Route::post("properties", [AttributeProcutController::class, "store_propertie"]);    
-    Route::delete("properties/{id}", [AttributeProcutController::class, "destroy_propertie"]);    
+
+    Route::post("properties", [AttributeProcutController::class, "store_propertie"]);
+    Route::delete("properties/{id}", [AttributeProcutController::class, "destroy_propertie"]);
     Route::resource("attributes", AttributeProcutController::class);
+
+    Route::resource("sliders", SliderController::class);
+    Route::post("sliders/{id}", [SliderController::class, "update"]);
 });
