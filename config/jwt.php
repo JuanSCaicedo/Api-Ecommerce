@@ -100,8 +100,8 @@ return [
     | Notice: If you set this to null you should remove 'exp' element from 'required_claims' list.
     |
     */
-
-    'ttl' => env('JWT_TTL', 60),
+    //Expira en 3 horas token auth
+    'ttl' => env('JWT_TTL', (60)*3),
 
     /*
     |--------------------------------------------------------------------------
