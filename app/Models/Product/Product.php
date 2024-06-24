@@ -13,12 +13,13 @@ class Product extends Model
     use SoftDeletes;
 
     protected $filable = [
-        "name",
+        "title",
         "slug",
         "sku",
         "price_cop",
         "price_usd",
         "resumen",
+        "imagen",
         "state",
         "description",
         "tags",

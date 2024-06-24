@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Admin\Product;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\Product\ProductCollection;
+use App\Http\Resources\Product\ProductResource;
 use App\Models\Product\Brand;
 use App\Models\Product\Categorie;
 use App\Models\Product\Product;
@@ -34,7 +36,7 @@ class ProductController extends Controller
 
         return response()->json([
             "total" => $products->total(),
-            "products" => $products,
+            "products" => ProductCollection::make($products),
         ]);
     }
 
@@ -90,7 +92,7 @@ class ProductController extends Controller
         $product = Product::findOrFail($id);
 
         return response()->json([
-            "product" => $product,
+            "product" => ProductResource::make($product),
         ]);
     }
 

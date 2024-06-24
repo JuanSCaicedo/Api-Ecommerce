@@ -2,25 +2,10 @@
 
 use App\Http\Controllers\Admin\Product\AttributeProcutController;
 use App\Http\Controllers\Admin\Product\CategorieController;
+use App\Http\Controllers\Admin\Product\ProductController;
 use App\Http\Controllers\Admin\SliderController;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
-
-/*
-|--------------------------------------------------------------------------
-| API Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register API routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "api" middleware group. Make something great!
-|
-*/
-
-// Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-//     return $request->user();
-// });
 
 Route::group([
 
@@ -54,4 +39,8 @@ Route::group([
 
     Route::resource("sliders", SliderController::class);
     Route::post("sliders/{id}", [SliderController::class, "update"]);
+
+    Route::get("products/config", [ProductController::class, "config"]);
+    Route::resource("products", ProductController::class);
+    Route::post("products/{id}", [ProductController::class, "update"]);
 });
