@@ -30,7 +30,6 @@ class CategorieController extends Controller
 
     public function config()
     {
-
         $categories_first = Categorie::where("categorie_second_id", NULL)->where("categorie_third_id", NULL)->get();
         $categories_seconds = Categorie::where("categorie_second_id", "<>", NULL)->where("categorie_third_id", NULL)->get();
 
