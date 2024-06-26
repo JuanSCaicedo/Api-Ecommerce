@@ -12,7 +12,7 @@ class Product extends Model
     use HasFactory;
     use SoftDeletes;
 
-    protected $filable = [
+    protected $fillable = [
         "title",
         "slug",
         "sku",
@@ -24,9 +24,9 @@ class Product extends Model
         "description",
         "tags",
         "brand_id",
-        "category_first_id",
-        "category_second_id",
-        "category_third_id",
+        "categorie_first_id",
+        "categorie_second_id",
+        "categorie_third_id",
         "stock",
     ];
 
@@ -41,17 +41,17 @@ class Product extends Model
         $this->attributes['updated_at'] = Carbon::now();
     }
 
-    public function category_first()
+    public function categorie_first()
     {
-        return $this->belongsTo(Categorie::class, "category_first_id");
+        return $this->belongsTo(Categorie::class, "categorie_first_id");
     }
-    public function category_second()
+    public function categorie_second()
     {
-        return $this->belongsTo(Categorie::class, "category_second_id");
+        return $this->belongsTo(Categorie::class, "categorie_second_id");
     }
-    public function category_third()
+    public function categorie_third()
     {
-        return $this->belongsTo(Categorie::class, "category_third_id");
+        return $this->belongsTo(Categorie::class, "categorie_third_id");
     }
     public function brand()
     {
@@ -74,13 +74,13 @@ class Product extends Model
             $query->where("title", "like", "%" . $search . "%");
         }
         if ($categorie_first_id) {
-            $query->where("category_first_id", $categorie_first_id);
+            $query->where("categorie_first_id", $categorie_first_id);
         }
         if ($cateforie_second_id) {
-            $query->where("category_second_id", $cateforie_second_id);
+            $query->where("categorie_second_id", $cateforie_second_id);
         }
         if ($categorie_third_id) {
-            $query->where("category_third_id", $categorie_third_id);
+            $query->where("categorie_third_id", $categorie_third_id);
         }
         if ($brand_id) {
             $query->where("brand_id", $brand_id);

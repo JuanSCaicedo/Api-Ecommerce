@@ -33,25 +33,25 @@ class ProductResource extends JsonResource
                 "name" => $this->resource->brand->name,
             ] : NULL,
 
-            "category_first_id" => $this->resource->category_first_id,
+            "categorie_first_id" => $this->resource->categorie_first_id,
 
-            "category_first" => $this->resource->category_first ? [
-                "id" => $this->resource->category_first->id,
-                "name" => $this->resource->category_first->name,
+            "categorie_first" => $this->resource->categorie_first ? [
+                "id" => $this->resource->categorie_first->id,
+                "name" => $this->resource->categorie_first->name,
             ] : NULL,
 
-            "category_second_id" => $this->resource->category_second_id,
+            "categorie_second_id" => $this->resource->categorie_second_id,
 
-            "category_second" => $this->resource->category_second ? [
-                "id" => $this->resource->category_second->id,
-                "name" => $this->resource->category_second->name,
+            "categorie_second" => $this->resource->categorie_second ? [
+                "id" => $this->resource->categorie_second->id,
+                "name" => $this->resource->categorie_second->name,
             ] : NULL,
 
-            "category_third_id" => $this->resource->category_third_id,
+            "categorie_third_id" => $this->resource->categorie_third_id,
 
-            "category_third" => $this->resource->category_third ? [
-                "id" => $this->resource->category_third->id,
-                "name" => $this->resource->category_third->name,
+            "categorie_third" => $this->resource->categorie_third ? [
+                "id" => $this->resource->categorie_third->id,
+                "name" => $this->resource->categorie_third->name,
             ] : NULL,
 
             "stock" => $this->resource->stock,
