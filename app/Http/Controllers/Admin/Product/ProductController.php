@@ -162,11 +162,20 @@ class ProductController extends Controller
     {
         $product = Product::findOrFail($id);
 
+        // Verificar y eliminar imágenes asociadas al producto
+        foreach ($product->images as $image) {
+            if ($image->imagen) {
+                Storage::delete($image->imagen);
+            }
+            $image->delete();
+        }
+
         // Verificar si el slider tiene una imagen y eliminarla si existe
         if ($product->imagen) {
             Storage::delete($product->imagen);
         }
 
+        //No se puede eliminar un producto que tenga una venta
         $product->delete();
 
         return response()->json([
