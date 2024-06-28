@@ -8,6 +8,7 @@ use App\Http\Resources\Product\ProductResource;
 use App\Models\Product\Brand;
 use App\Models\Product\Categorie;
 use App\Models\Product\Product;
+use App\Models\Product\ProductImage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
@@ -84,6 +85,27 @@ class ProductController extends Controller
         ]);
     }
 
+    public function imagens(Request $request)
+    {
+        $product_id = $request->product_id;
+
+        if ($request->hasFile("imagen_add")) {
+            $path = Storage::putFile("products", $request->file("imagen_add"));
+        }
+
+        $product_imagen = ProductImage::create(([
+            "imagen" => $path,
+            "product_id" => $product_id,
+        ]));
+
+        return response()->json([
+            "imagen" => [
+                "id" => $product_imagen->id,
+                "imagen" => env("APP_URL") . "storage/" . $product_imagen->imagen,
+            ],
+        ]);
+    }
+
     /**
      * Display the specified resource.
      */
@@ -139,6 +161,22 @@ class ProductController extends Controller
     public function destroy(string $id)
     {
         $product = Product::findOrFail($id);
+
+        // Verificar si el slider tiene una imagen y eliminarla si existe
+        if ($product->imagen) {
+            Storage::delete($product->imagen);
+        }
+
+        $product->delete();
+
+        return response()->json([
+            "message" => 200,
+        ]);
+    }
+
+    public function delete_imagen(string $id)
+    {
+        $product = ProductImage::findOrFail($id);
 
         // Verificar si el slider tiene una imagen y eliminarla si existe
         if ($product->imagen) {

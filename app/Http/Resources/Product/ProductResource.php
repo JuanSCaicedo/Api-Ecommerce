@@ -5,6 +5,8 @@ namespace App\Http\Resources\Product;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+use function PHPSTORM_META\map;
+
 class ProductResource extends JsonResource
 {
     /**
@@ -56,6 +58,12 @@ class ProductResource extends JsonResource
 
             "stock" => $this->resource->stock,
             "created_at" => $this->resource->created_at->format("Y-m-d H:i:s"),
+            "images" => $this->resource->images->map(function ($image) {
+                return [
+                    "id" => $image->id,
+                    "imagen" => env("APP_URL") . "storage/" . $image->imagen,
+                ];
+            }),
         ];
     }
 }
