@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\Product\AttributeProcutController;
+use App\Http\Controllers\Admin\Product\BrandController;
 use App\Http\Controllers\Admin\Product\CategorieController;
 use App\Http\Controllers\Admin\Product\ProductController;
 use App\Http\Controllers\Admin\SliderController;
@@ -46,4 +47,6 @@ Route::group([
     Route::post("products/index", [ProductController::class, "index"]);
     Route::resource("products", ProductController::class);
     Route::post("products/{id}", [ProductController::class, "update"]);
+
+    Route::resource("brands", BrandController::class);
 });

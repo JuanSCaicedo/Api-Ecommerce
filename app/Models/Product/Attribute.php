@@ -18,6 +18,15 @@ class Attribute extends Model
         'state'
     ];
 
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::deleting(function ($attribute) {
+            $attribute->properties()->delete();
+        });
+    }
+
     public function setCreatedAtAttribute($value)
     {
         date_default_timezone_set('America/Bogota');
