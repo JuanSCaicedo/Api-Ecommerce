@@ -53,7 +53,10 @@ class CategorieController extends Controller
             $request->request->add(["imagen" =>  $path]);
         }
         $categorie = Categorie::create($request->all());
-        return response()->json(["message" => 200]);
+        return response()->json([
+            "message" => 200,
+            "id" => $categorie->id,  // Include the ID in the response
+        ]);
     }
 
     /**

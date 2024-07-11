@@ -82,6 +82,7 @@ class ProductController extends Controller
 
         return response()->json([
             "message" => 200,
+            "id" => $product->id,  // Include the ID in the response
         ]);
     }
 

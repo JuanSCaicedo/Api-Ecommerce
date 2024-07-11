@@ -47,7 +47,10 @@ class SliderController extends Controller
             $request->request->add(["imagen" =>  $path]);
         }
         $slider = Slider::create($request->all());
-        return response()->json(["message" => 200]);
+        return response()->json([
+            "message" => 200,
+            "id" => $slider->id,  // Include the ID in the response
+        ]);
     }
 
     /**
