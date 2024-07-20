@@ -4,6 +4,8 @@ use App\Http\Controllers\Admin\Product\AttributeProcutController;
 use App\Http\Controllers\Admin\Product\BrandController;
 use App\Http\Controllers\Admin\Product\CategorieController;
 use App\Http\Controllers\Admin\Product\ProductController;
+use App\Http\Controllers\Admin\Product\ProductSpecificationsController;
+use App\Http\Controllers\Admin\Product\ProductVariationsController;
 use App\Http\Controllers\Admin\SliderController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
@@ -49,4 +51,8 @@ Route::group([
     Route::post("products/{id}", [ProductController::class, "update"]);
 
     Route::resource("brands", BrandController::class);
+
+    Route::resource("variations", ProductVariationsController::class);
+
+    Route::resource("specifications", ProductSpecificationsController::class);
 });
