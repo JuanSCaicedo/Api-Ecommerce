@@ -13,9 +13,9 @@ class Attribute extends Model
     use SoftDeletes;
 
     protected $fillable = [
-        'name',
-        'type_attribute',
-        'state'
+        "name",
+        "type_attribute",
+        "state"
     ];
 
     protected static function boot()
