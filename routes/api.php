@@ -53,6 +53,7 @@ Route::group([
     Route::resource("brands", BrandController::class);
 
     Route::resource("variations", ProductVariationsController::class);
+    Route::get("variations/config", [ProductVariationsController::class, "config"]);
 
     Route::resource("specifications", ProductSpecificationsController::class);
 });
