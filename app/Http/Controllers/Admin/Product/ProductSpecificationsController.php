@@ -62,7 +62,7 @@ class ProductSpecificationsController extends Controller
         if ($is_valid_variation) {
             return response()->json([
                 "message" => 403,
-                "message_text" => "Ya existe una variación con estos datos"
+                "message_text" => "Ya existe una especificación con estos datos"
             ]);
         }
 
@@ -70,7 +70,7 @@ class ProductSpecificationsController extends Controller
 
         return response()->json([
             "message" => 200,
-            "variation" => [
+            "specification" => [
                 "product_id" => $product_specification->product_id,
                 "attribute_id" => $product_specification->attribute_id,
                 "attribute" => $product_specification->attribute ? [
@@ -120,7 +120,7 @@ class ProductSpecificationsController extends Controller
         if ($is_valid_variation) {
             return response()->json([
                 "message" => 403,
-                "message_text" => "Ya existe una variación con estos datos"
+                "message_text" => "Ya existe una especificación con estos datos"
             ]);
         }
 
