@@ -35,7 +35,7 @@ class ProductVariationsController extends Controller
                         "code" => $variation->propertie->code,
                     ] : NULL,
                     "value_add" => $variation->value_add,
-                    "add_price" => $variation->price,
+                    "add_price" => $variation->add_price,
                     "stock" => $variation->stock,
                     "state" => $variation->state,
                 ];
@@ -91,6 +91,21 @@ class ProductVariationsController extends Controller
      */
     public function store(Request $request)
     {
+        $variations_exits = ProductVariation::where("product_id", $request->product_id)->count();
+
+        if($variations_exits > 0) {
+            $variations_attributes_exits = ProductVariation::where("product_id", $request->product_id)
+                ->where("attribute_id", $request->attribute_id)
+                ->count();
+            
+            if($variations_attributes_exits == 0) {
+                return response()->json([
+                    "message" => 403,
+                    "message_text" => "No se puede agregar un atributo diferente en la lista de variaciones"
+                ]);
+            }
+        }
+
         $is_valid_variation = null;
 
         if ($request->propertie_id) {
@@ -129,7 +144,7 @@ class ProductVariationsController extends Controller
                     "code" => $product_variation->propertie->code,
                 ] : NULL,
                 "value_add" => $product_variation->value_add,
-                "add_price" => $product_variation->price,
+                "add_price" => $product_variation->add_price,
                 "stock" => $product_variation->stock,
                 "state" => $product_variation->state,
             ]
@@ -190,7 +205,7 @@ class ProductVariationsController extends Controller
                     "code" => $product_variation->propertie->code,
                 ] : NULL,
                 "value_add" => $product_variation->value_add,
-                "add_price" => $product_variation->price,
+                "add_price" => $product_variation->add_price,
                 "stock" => $product_variation->stock,
                 "state" => $product_variation->state,
             ]
