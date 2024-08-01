@@ -23,6 +23,7 @@ class ProductVariationsController extends Controller
         return response()->json([
             "variations" => $variations->map(function ($variation) {
                 return [
+                    "id" => $variation->id,
                     "product_id" => $variation->product_id,
                     "attribute_id" => $variation->attribute_id,
                     "attribute" => $variation->attribute ? [
@@ -132,6 +133,7 @@ class ProductVariationsController extends Controller
         return response()->json([
             "message" => 200,
             "variation" => [
+                "id" => $product_variation->id,
                 "product_id" => $product_variation->product_id,
                 "attribute_id" => $product_variation->attribute_id,
                 "attribute" => $product_variation->attribute ? [
@@ -193,6 +195,7 @@ class ProductVariationsController extends Controller
         return response()->json([
             "message" => 200,
             "variation" => [
+                "id" => $product_variation->id,
                 "product_id" => $product_variation->product_id,
                 "attribute_id" => $product_variation->attribute_id,
                 "attribute" => $product_variation->attribute ? [
