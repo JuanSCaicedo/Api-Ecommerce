@@ -94,12 +94,12 @@ class ProductVariationsController extends Controller
     {
         $variations_exits = ProductVariation::where("product_id", $request->product_id)->count();
 
-        if($variations_exits > 0) {
+        if ($variations_exits > 0) {
             $variations_attributes_exits = ProductVariation::where("product_id", $request->product_id)
                 ->where("attribute_id", $request->attribute_id)
                 ->count();
-            
-            if($variations_attributes_exits == 0) {
+
+            if ($variations_attributes_exits == 0) {
                 return response()->json([
                     "message" => 403,
                     "message_text" => "No se puede agregar un atributo diferente en la lista de variaciones"
@@ -166,6 +166,21 @@ class ProductVariationsController extends Controller
      */
     public function update(Request $request, string $id)
     {
+        $variations_exits = ProductVariation::where("product_id", $request->product_id)->count();
+
+        if ($variations_exits > 0) {
+            $variations_attributes_exits = ProductVariation::where("product_id", $request->product_id)
+                ->where("attribute_id", $request->attribute_id)
+                ->count();
+
+            if ($variations_attributes_exits == 0) {
+                return response()->json([
+                    "message" => 403,
+                    "message_text" => "No se puede agregar un atributo diferente en la lista de variaciones"
+                ]);
+            }
+        }
+
         $is_valid_variation = null;
 
         if ($request->propertie_id) {
