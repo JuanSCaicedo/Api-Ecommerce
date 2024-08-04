@@ -9,6 +9,10 @@ use Illuminate\Http\Request;
 
 class ProductVariationsController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('throttle:10,1')->only(['update', 'store', 'destroy']);
+    }
     /**
      * Display a listing of the resource.
      */

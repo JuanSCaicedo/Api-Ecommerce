@@ -10,9 +10,10 @@ use App\Http\Controllers\Admin\SliderController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 
+
 Route::group([
 
-    // 'middleware' => 'auth:api',
+    'middleware' => 'throttle:10,1',
     'prefix' => 'auth'
 
 ], function ($router) {
@@ -52,7 +53,7 @@ Route::group([
 
     Route::resource("brands", BrandController::class);
 
-    Route::get("variations/config",[ProductVariationsController::class,"config"]);
+    Route::get("variations/config", [ProductVariationsController::class, "config"]);
     Route::resource("variations", ProductVariationsController::class);
 
     Route::resource("specifications", ProductSpecificationsController::class);

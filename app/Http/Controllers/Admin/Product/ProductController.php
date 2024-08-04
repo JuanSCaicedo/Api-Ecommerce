@@ -15,6 +15,10 @@ use Illuminate\Support\Facades\Storage;
 
 class ProductController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('throttle:10,1')->only(['update', 'store', 'destroy', 'delete_imagen']);
+    }
     /**
      * Display a listing of the resource.
      */

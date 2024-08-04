@@ -11,6 +11,10 @@ use Illuminate\Support\Facades\Storage;
 
 class CategorieController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('throttle:10,1')->only(['update', 'store', 'destroy']);
+    }
     /**
      * Display a listing of the resource.
      */
