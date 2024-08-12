@@ -56,8 +56,9 @@ class ProductVariationsAnidadoController extends Controller
      */
     public function store(Request $request)
     {
-        $variations_exits = ProductVariation::where("product_id", $request->product_id)->count();
         $product_variation_id = $request->product_variation_id;
+        
+        $variations_exits = ProductVariation::where("product_id", $request->product_id)->where("product_variation_id", $product_variation_id)->count();
 
         if ($variations_exits > 0) {
             $variations_attributes_exits = ProductVariation::where("product_id", $request->product_id)

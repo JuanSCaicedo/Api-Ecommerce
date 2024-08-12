@@ -21,6 +21,7 @@ class ProductVariationsController extends Controller
         $product_id = $request->product_id;
 
         $variations = ProductVariation::where("product_id", $product_id)
+            ->where("product_variation_id", NULL)
             ->orderBy("id", "desc")
             ->get();
 
