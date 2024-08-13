@@ -97,10 +97,11 @@ class ProductVariationsController extends Controller
      */
     public function store(Request $request)
     {
-        $variations_exits = ProductVariation::where("product_id", $request->product_id)->count();
+        $variations_exits = ProductVariation::where("product_id", $request->product_id)->where("product_variation_id", NULL)->count();
 
         if ($variations_exits > 0) {
             $variations_attributes_exits = ProductVariation::where("product_id", $request->product_id)
+                ->where("product_variation_id", NULL)
                 ->where("attribute_id", $request->attribute_id)
                 ->count();
 
@@ -116,11 +117,13 @@ class ProductVariationsController extends Controller
 
         if ($request->propertie_id) {
             $is_valid_variation = ProductVariation::where("product_id", $request->product_id)
+                ->where("product_variation_id", NULL)
                 ->where("attribute_id", $request->attribute_id)
                 ->where("propertie_id", $request->propertie_id)
                 ->first();
         } else {
             $is_valid_variation = ProductVariation::where("product_id", $request->product_id)
+                ->where("product_variation_id", NULL)
                 ->where("attribute_id", $request->attribute_id)
                 ->where("value_add", $request->value_add)
                 ->first();
@@ -171,10 +174,11 @@ class ProductVariationsController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $variations_exits = ProductVariation::where("product_id", $request->product_id)->count();
+        $variations_exits = ProductVariation::where("product_id", $request->product_id)->where("product_variation_id", NULL)->count();
 
         if ($variations_exits > 0) {
             $variations_attributes_exits = ProductVariation::where("product_id", $request->product_id)
+                ->where("product_variation_id", NULL)
                 ->where("attribute_id", $request->attribute_id)
                 ->count();
 
@@ -190,12 +194,14 @@ class ProductVariationsController extends Controller
 
         if ($request->propertie_id) {
             $is_valid_variation = ProductVariation::where("product_id", $request->product_id)
+                ->where("product_variation_id", NULL)
                 ->where("id", "<>", $id)
                 ->where("attribute_id", $request->attribute_id)
                 ->where("propertie_id", $request->propertie_id)
                 ->first();
         } else {
             $is_valid_variation = ProductVariation::where("product_id", $request->product_id)
+                ->where("product_variation_id", NULL)
                 ->where("id", "<>", $id)
                 ->where("attribute_id", $request->attribute_id)
                 ->where("value_add", $request->value_add)

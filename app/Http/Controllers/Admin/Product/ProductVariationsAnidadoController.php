@@ -97,6 +97,22 @@ class ProductVariationsAnidadoController extends Controller
             ]);
         }
 
+        $product_var = ProductVariation::find($product_variation_id);
+        $TOTAL_STOCK_VARIATION_CENTRAL = $product_var ? $product_var->stock : 0;
+
+        $SUM_TOTAL_STOCK_ANIDADOS = ProductVariation::where("product_id", $request->product_id)
+            ->where("product_variation_id", $product_variation_id)
+            ->sum("stock");
+
+        $SUM_TOTAL_STOCK_ANIDADOS = $SUM_TOTAL_STOCK_ANIDADOS + $request->stock;
+
+        if ($SUM_TOTAL_STOCK_ANIDADOS > $TOTAL_STOCK_VARIATION_CENTRAL) {
+            return response()->json([
+                "message" => 403,
+                "message_text" => "El stock de las variaciones anidadas no puede ser mayor al stock de la variación central"
+            ]);
+        }
+
         $product_variation = ProductVariation::create($request->all());
 
         return response()->json([
