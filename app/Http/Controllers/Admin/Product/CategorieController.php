@@ -114,6 +114,17 @@ class CategorieController extends Controller
             Storage::delete($categorie->imagen);
         }
 
+        if (
+            $categorie->product_categorie_firsts->count() > 0
+            || $categorie->product_categorie_seconds->count() > 0
+            || $categorie->product_categorie_thirds->count() > 0
+        ) {
+            return response()->json([
+                "message" => 403,
+                "message_text" => "La categoría no puede ser eliminada porque tiene productos asociados",
+            ]);
+        }
+
         $categorie->delete();
 
         //Validar que la categoria no esté en ningun producto

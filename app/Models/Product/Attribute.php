@@ -32,6 +32,7 @@ class Attribute extends Model
         date_default_timezone_set('America/Bogota');
         $this->attributes['created_at'] = Carbon::now();
     }
+
     public function setUpdatedAtAttribute($value)
     {
         date_default_timezone_set('America/Bogota');
@@ -40,5 +41,13 @@ class Attribute extends Model
 
     public function properties() {
         return $this->hasMany(Propertie::class);
+    }
+
+    public function specifications(){
+        return $this->hasMany(ProductSpecification::class);
+    }
+
+    public function variations(){
+        return $this->hasMany(ProductVariation::class);
     }
 }

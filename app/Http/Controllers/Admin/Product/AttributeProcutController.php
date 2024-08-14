@@ -141,6 +141,14 @@ class AttributeProcutController extends Controller
     public function destroy(string $id)
     {
         $attribute = Attribute::findOrFail($id);
+
+        if ($attribute->specifications->count() > 0 || $attribute->variations->count() > 0) {
+            return response()->json([
+                "message" => 403,
+                "message_text" => "El atributo no puede ser eliminado porque tiene productos asociados",
+            ]);
+        }
+
         $attribute->delete();
 
         return response()->json([
@@ -151,6 +159,14 @@ class AttributeProcutController extends Controller
     public function destroy_propertie($id)
     {
         $propertie = Propertie::findOrFail($id);
+
+        if ($propertie->specifications->count() > 0 || $propertie->variations->count() > 0) {
+            return response()->json([
+                "message" => 403,
+                "message_text" => "La propiedad no puede ser eliminada porque tiene productos asociados",
+            ]);
+        }
+
         $propertie->delete();
 
         return response()->json([
