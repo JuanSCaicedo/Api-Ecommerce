@@ -1,6 +1,8 @@
 <?php
 
 namespace App\Models\Cupone;
+
+use App\Models\Product\Categorie;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Carbon\Carbon;
 
@@ -26,5 +28,10 @@ class CuponeCategorie extends Model
     {
         date_default_timezone_set('America/Bogota');
         $this->attributes['updated_at'] = Carbon::now();
+    }
+
+    public function categorie()
+    {
+        return $this->belongsTo(Categorie::class);
     }
 }

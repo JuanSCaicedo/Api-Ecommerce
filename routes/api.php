@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\Cupone\CuponeController;
 use App\Http\Controllers\Admin\Product\AttributeProcutController;
 use App\Http\Controllers\Admin\Product\BrandController;
 use App\Http\Controllers\Admin\Product\CategorieController;
@@ -59,4 +60,5 @@ Route::group([
     Route::resource("anidado_variations", ProductVariationsAnidadoController::class);
 
     Route::resource("specifications", ProductSpecificationsController::class);
+    Route::resource("cupones", CuponeController::class);
 });

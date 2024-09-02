@@ -16,9 +16,10 @@ class Cupone extends Model
         "code",
         "type_discount",
         "discount",
-        "type_discount",
+        "type_count",
         "num_use",
         "type_cupone",
+        "state",
     ];
 
     public function setCreatedAtAttribute($value)

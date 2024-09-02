@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Admin\Cupone;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\Cupone\CuponeCollection;
+use App\Http\Resources\Cupone\CuponeResource;
 use App\Models\Cupone\Cupone;
 use App\Models\Cupone\CuponeBrand;
 use App\Models\Cupone\CuponeCategorie;
@@ -20,7 +22,7 @@ class CuponeController extends Controller
 
         return response()->json([
             "total" => $cupones->total(),
-            "cupones" => $cupones,
+            "cupones" => CuponeCollection::make($cupones),
         ]);
     }
 
@@ -73,7 +75,7 @@ class CuponeController extends Controller
     {
         $CUPONE = Cupone::findOrFail($id);
 
-        return response()->json(["cupone" => $CUPONE]);
+        return response()->json(["cupone" => CuponeResource::make($CUPONE)]);
     }
 
     /**
