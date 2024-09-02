@@ -60,5 +60,6 @@ Route::group([
     Route::resource("anidado_variations", ProductVariationsAnidadoController::class);
 
     Route::resource("specifications", ProductSpecificationsController::class);
+    Route::get("cupones/config", [CuponeController::class, "config"]);
     Route::resource("cupones", CuponeController::class);
 });
