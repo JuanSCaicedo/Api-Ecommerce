@@ -16,6 +16,10 @@ use Illuminate\Http\Request;
 
 class CuponeController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('throttle:10,1')->only(['update', 'store', 'destroy', 'delete_imagen']);
+    }
     /**
      * Display a listing of the resource.
      */
@@ -103,7 +107,10 @@ class CuponeController extends Controller
             ]);
         }
 
-        return response()->json(["message" => 200]);
+        return response()->json([
+            "message" => 200,
+            "id" => $CUPONE->id,  // Include the ID in the response
+        ]);
     }
 
     /**
