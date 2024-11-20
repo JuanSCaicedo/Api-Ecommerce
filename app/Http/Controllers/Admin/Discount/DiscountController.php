@@ -49,7 +49,7 @@ class DiscountController extends Controller
                 if ($EXIST_DISCOUNT_START_DATE || $EXIST_DISCOUNT_END_DATE) {
                     return response()->json([
                         "message" => 403,
-                        "message_text" => "El producto " . $product_selected["tittle"] . " ya tiene un descuento en el rango de fechas seleccionado, que es " . ($EXIST_DISCOUNT_START_DATE ? '#' . $EXIST_DISCOUNT_START_DATE->code : '')
+                        "message_text" => "El producto " . $product_selected["title"] . " ya tiene un descuento en el rango de fechas seleccionado, que es " . ($EXIST_DISCOUNT_START_DATE ? '#' . $EXIST_DISCOUNT_START_DATE->code : '')
                             . ($EXIST_DISCOUNT_END_DATE ? '#' . $EXIST_DISCOUNT_END_DATE->code : '')
                     ]);
                 }
@@ -171,7 +171,7 @@ class DiscountController extends Controller
                 if ($EXIST_DISCOUNT_START_DATE || $EXIST_DISCOUNT_END_DATE) {
                     return response()->json([
                         "message" => 403,
-                        "message_text" => "El producto " . $product_selected["tittle"] . " ya tiene un descuento en el rango de fechas seleccionado, que es " . ($EXIST_DISCOUNT_START_DATE ? '#' . $EXIST_DISCOUNT_START_DATE->code : '')
+                        "message_text" => "El producto " . $product_selected["title"] . " ya tiene un descuento en el rango de fechas seleccionado, que es " . ($EXIST_DISCOUNT_START_DATE ? '#' . $EXIST_DISCOUNT_START_DATE->code : '')
                             . ($EXIST_DISCOUNT_END_DATE ? '#' . $EXIST_DISCOUNT_END_DATE->code : '')
                     ]);
                 }

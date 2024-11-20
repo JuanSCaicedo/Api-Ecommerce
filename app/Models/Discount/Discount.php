@@ -20,7 +20,7 @@ class Discount extends Model
         "start_date",
         "end_date",
         "discount_type",
-        "type_campaign",
+        "type_campaing",
         "state",
     ];
 

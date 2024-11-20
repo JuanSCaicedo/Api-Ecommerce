@@ -25,7 +25,7 @@ class DiscountResource extends JsonResource
             "discount_type" => $this->resource->discount_type,
             "state" => $this->resource->state,
             "created_at" => $this->resource->created_at->format('Y-m-d h:i A'),
-            "type_campaign" => $this->resource->type_campaign,
+            "type_campaing" => $this->resource->type_campaing,
 
             "products" => $this->resource->products->map(function($product_aux) {
                 return [
