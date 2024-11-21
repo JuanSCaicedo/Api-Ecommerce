@@ -281,6 +281,7 @@ class DiscountController extends Controller
         $discount = Discount::findOrFail($id);
 
         //Si peretenece a una venta no debe eliminarse
+        $discount->delete();
 
         return response()->json([
             "message" => 200,
