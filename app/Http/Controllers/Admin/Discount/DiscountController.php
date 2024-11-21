@@ -16,9 +16,10 @@ class DiscountController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $discounts = Discount::orderBy("id", "desc")->paginate(25);
+        // $discounts = Discount::orderBy("id", "desc")->paginate(25);
+        $discounts = Discount::where("code", "like", "%$request->search%")->orderBy("id", "desc")->paginate(25);
 
         return response()->json([
             "total" => $discounts->total(),
