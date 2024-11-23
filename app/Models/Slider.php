@@ -13,13 +13,16 @@ class Slider extends Model
     use SoftDeletes;
 
     protected $fillable = [
-        'title',
-        'subtitle',
-        'label',
-        'imagen',
-        'link',
-        'state',
-        'color',
+        "title",
+        "subtitle",
+        "label",
+        "imagen",
+        "link",
+        "state",
+        "color",
+        "type_slider",
+        "price_original",
+        "price_campaing",
     ];
 
     public function setCreatedAtAttribute($value)

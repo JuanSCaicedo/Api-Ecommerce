@@ -35,6 +35,9 @@ class SliderController extends Controller
                     "imagen" => env("APP_URL") . "storage/" . $slider->imagen,
                     "link" => $slider->link,
                     "state" => $slider->state,
+                    "type_slider" => $slider->type_slider,
+                    "price_original" => $slider->price_original,
+                    "price_campaing" => $slider->price_campaing,
                     "color" => $slider->color,
                 ];
             })
@@ -72,6 +75,9 @@ class SliderController extends Controller
             "imagen" => env("APP_URL") . "storage/" . $slider->imagen,
             "link" => $slider->link,
             "state" => $slider->state,
+            "type_slider" => $slider->type_slider,
+            "price_original" => $slider->price_original,
+            "price_campaing" => $slider->price_campaing,
             "color" => $slider->color,
         ]]);
     }
