@@ -10,7 +10,7 @@ class HomeController extends Controller
 {
     public function home(Request $request)
     {
-        $sliders_principal = Slider::where("state", 1)->orderBy("order", "desc")->get();
+        $sliders_principal = Slider::where("state", 1)->where("type_slider", 1)->orderBy("id", "desc")->get();
 
         return response()->json([
             "sliders_principal" => $sliders_principal->map(function ($slider) {

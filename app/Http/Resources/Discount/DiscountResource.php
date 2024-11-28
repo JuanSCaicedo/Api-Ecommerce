@@ -17,7 +17,7 @@ class DiscountResource extends JsonResource
     {
         return [
             "id" => $this->resource->id,
-            "code" => $this->code,
+            "code" => $this->resource->code,
             "type_discount" => $this->resource->type_discount,
             "discount" => $this->resource->discount,
             "start_date" => Carbon::parse($this->resource->start_date)->format('Y-m-d'),
