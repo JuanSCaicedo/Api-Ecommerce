@@ -106,7 +106,7 @@ class ProductController extends Controller
         return response()->json([
             "imagen" => [
                 "id" => $product_imagen->id,
-                "imagen" => env("APP_URL") . "storage/" . $product_imagen->imagen,
+                "imagen" => env("APP_URL") . "/storage/" . $product_imagen->imagen,
             ],
         ]);
     }
