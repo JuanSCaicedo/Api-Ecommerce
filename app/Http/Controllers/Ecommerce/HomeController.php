@@ -70,7 +70,7 @@ class HomeController extends Controller
 
     public function slider_secundario()
     {
-        $sliders_secundario = Slider::where("state", 1)->where("type_slider", 2)->orderBy("id", "desc")->get();
+        $sliders_secundario = Slider::where("state", 1)->where("type_slider", 2)->orderBy("id", "asc")->get();
 
         return response()->json([
             "sliders_secundario" => $sliders_secundario->map(function ($slider) {
