@@ -21,6 +21,7 @@ class Slider extends Model
         "state",
         "color",
         "type_slider",
+        "type_width",
         "price_original",
         "price_campaing",
     ];
