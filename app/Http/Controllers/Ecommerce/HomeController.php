@@ -124,4 +124,13 @@ class HomeController extends Controller
             "product_trending_top_sellers" => ProductEcommerceCollection::make($product_trending_top_sellers),
         ]);
     }
+
+    public function products_electronics(Request $request)
+    {
+        $product_electronics = Product::where("state",2)->where("categorie_first_id",1)->inRandomOrder()->limit(6)->get();
+        return response()->json([
+
+            "product_electronics" => ProductEcommerceCollection::make($product_electronics),
+        ]);
+    }
 }
