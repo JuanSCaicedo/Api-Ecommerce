@@ -8,6 +8,7 @@ use App\Models\Product\Categorie;
 use App\Models\Product\Product;
 use App\Models\Slider;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class HomeController extends Controller
 {
@@ -92,19 +93,17 @@ class HomeController extends Controller
         ]);
     }
 
-    private function getCategoriesRandoms()
-    {
-        return Categorie::withCount(["product_categorie_firsts"])
-            ->where("categorie_second_id", NULL)
-            ->where("categorie_third_id", NULL)
-            ->inRandomOrder()
-            ->limit(5)
-            ->get();
-    }
-
     public function categories(Request $request)
     {
-        $categories_randoms = $this->getCategoriesRandoms();
+        // Generar o recuperar categorías aleatorias desde la caché
+        $categories_randoms = Cache::remember('categories_randoms', 60, function () {
+            return Categorie::withCount(["product_categorie_firsts"])
+                ->where("categorie_second_id", NULL)
+                ->where("categorie_third_id", NULL)
+                ->inRandomOrder()
+                ->limit(5)
+                ->get();
+        });
 
         return response()->json([
 
@@ -146,8 +145,9 @@ class HomeController extends Controller
 
     public function products_carusel(Request $request)
     {
-        $categories_randoms = $this->getCategoriesRandoms();
-        
+        // Recuperar las mismas categorías aleatorias desde la caché
+        $categories_randoms = Cache::get('categories_randoms', collect());
+
         $product_carusel = Product::where("state", 2)->whereIn("categorie_first_id", $categories_randoms->pluck("id"))->inRandomOrder()->get();
 
         return response()->json([
