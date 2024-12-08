@@ -92,9 +92,19 @@ class HomeController extends Controller
         ]);
     }
 
+    private function getCategoriesRandoms()
+    {
+        return Categorie::withCount(["product_categorie_firsts"])
+            ->where("categorie_second_id", NULL)
+            ->where("categorie_third_id", NULL)
+            ->inRandomOrder()
+            ->limit(5)
+            ->get();
+    }
+
     public function categories(Request $request)
     {
-        $categories_randoms = Categorie::withCount(["product_categorie_firsts"])->where("categorie_second_id", NULL)->where("categorie_third_id", NULL)->inRandomOrder()->limit(5)->get();
+        $categories_randoms = $this->getCategoriesRandoms();
 
         return response()->json([
 
@@ -127,10 +137,21 @@ class HomeController extends Controller
 
     public function products_electronics(Request $request)
     {
-        $product_electronics = Product::where("state",2)->where("categorie_first_id",1)->inRandomOrder()->limit(6)->get();
+        $product_electronics = Product::where("state", 2)->where("categorie_first_id", 1)->inRandomOrder()->limit(6)->get();
         return response()->json([
 
             "product_electronics" => ProductEcommerceCollection::make($product_electronics),
+        ]);
+    }
+
+    public function products_carusel(Request $request)
+    {
+        $categories_randoms = $this->getCategoriesRandoms();
+        
+        $product_carusel = Product::where("state", 2)->whereIn("categorie_first_id", $categories_randoms->pluck("id"))->inRandomOrder()->get();
+
+        return response()->json([
+            "product_carusel" => ProductEcommerceCollection::make($product_carusel),
         ]);
     }
 }

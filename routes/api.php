@@ -78,4 +78,5 @@ Route::group([
     Route::get("categories", [HomeController::class, "categories"]);
     Route::get("products", [HomeController::class, "products"]);
     Route::get("products_electronics", [HomeController::class, "products_electronics"]);
+    Route::get("products_carusel", [HomeController::class, "products_carusel"]);
 });
