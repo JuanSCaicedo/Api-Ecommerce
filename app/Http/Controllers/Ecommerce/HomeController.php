@@ -151,10 +151,22 @@ class HomeController extends Controller
         return response()->json([
 
             "product_trending_new" => ProductEcommerceCollection::make($product_trending_new),
-
             "product_trending_featured" => ProductEcommerceCollection::make($product_trending_featured),
-
             "product_trending_top_sellers" => ProductEcommerceCollection::make($product_trending_top_sellers),
+        ]);
+    }
+
+    public function last_products(Request $request)
+    {
+        $product_last_discounts = Product::where("state", 2)->inRandomOrder()->limit(3)->get();
+        $product_last_featured = Product::where("state", 2)->inRandomOrder()->limit(3)->get();
+        $product_last_selling = Product::where("state", 2)->inRandomOrder()->limit(3)->get();
+
+        return response()->json([
+
+            "product_last_discounts" => ProductEcommerceCollection::make($product_last_discounts),
+            "product_last_featured" => ProductEcommerceCollection::make($product_last_featured),
+            "product_last_selling" => ProductEcommerceCollection::make($product_last_selling),
         ]);
     }
 
