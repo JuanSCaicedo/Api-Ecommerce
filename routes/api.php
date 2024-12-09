@@ -75,6 +75,7 @@ Route::group([
     Route::get("menu", [HomeController::class, "menu"]);
     Route::get("slider", [HomeController::class, "slider"]);
     Route::get("slider_secundario", [HomeController::class, "slider_secundario"]);
+    Route::get("slider_products", [HomeController::class, "slider_products"]);
     Route::get("categories", [HomeController::class, "categories"]);
     Route::get("products", [HomeController::class, "products"]);
     Route::get("products_electronics", [HomeController::class, "products_electronics"]);
