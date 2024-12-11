@@ -35,15 +35,30 @@ class Discount extends Model
         $this->attributes['updated_at'] = Carbon::now();
     }
 
-    public function categories() {
+    public function categories()
+    {
         return $this->hasMany(DiscountCategorie::class);
     }
 
-    public function products() {
+    public function products()
+    {
         return $this->hasMany(DiscountProduct::class);
     }
 
-    public function brands() {
+    public function brands()
+    {
         return $this->hasMany(DiscountBrand::class);
+    }
+
+    // Evento deleting para eliminar relaciones asociadas
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::deleting(function ($discount) {
+            $discount->products()->delete();   // Elimina los productos asociados
+            $discount->categories()->delete(); // Elimina las categorías asociadas
+            $discount->brands()->delete();     // Elimina las marcas asociadas
+        });
     }
 }
