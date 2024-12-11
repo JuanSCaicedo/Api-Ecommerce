@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Ecommerce;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Ecommerce\Product\ProductEcommerceCollection;
+use App\Http\Resources\Ecommerce\Product\ProductEcommerceResource;
+use App\Models\Discount\Discount;
 use App\Models\Product\Categorie;
 use App\Models\Product\Product;
 use App\Models\Slider;
@@ -15,6 +17,45 @@ class HomeController extends Controller
     public function home(Request $request)
     {
         //Lógica de la página de inicio
+    }
+
+    public function discount_flash(Request $request)
+    {
+        date_default_timezone_set("America/Bogota");
+
+        $discount_flash = Discount::where("type_campaing", 2)->where("state", 1)
+            ->where("start_date", "<=", today())
+            ->where("end_date", ">=", today())
+            ->first();
+
+        $discount_flash_products = collect([]);
+
+        if($discount_flash) {
+            foreach ($discount_flash->products as $aux_product) {
+                $discount_flash_products->push(ProductEcommerceResource::make($aux_product->product));
+            }
+
+            foreach ($discount_flash->categories as $aux_categorie) {
+                $products_of_categories = Product::where("state", 2)->where("categorie_first_id", $aux_categorie->categorie_id)->get();
+
+                foreach ($products_of_categories as $product) {
+                    $discount_flash_products->push(ProductEcommerceResource::make($product));
+                }
+            }
+
+            foreach ($discount_flash->brands as $aux_brand) {
+                $products_of_brands = Product::where("state", 2)->where("brand_id", $aux_brand->brand_id)->get();
+
+                foreach ($products_of_brands as $product) {
+                    $discount_flash_products->push(ProductEcommerceResource::make($product));
+                }
+            }
+        }
+
+        return response()->json([
+            "discount_flash" => $discount_flash,
+            "discount_flash_products" => $discount_flash_products,
+        ]);
     }
 
     public function menu(Request $request)
