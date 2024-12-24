@@ -14,6 +14,29 @@ class ProductEcommerceResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        $discount_g = null;
+
+        $discount_collect = collect([]);
+
+        $discount_product = $this->resource->discount_product;
+        if($discount_product) {
+            $discount_collect->push($discount_product);
+        }
+
+        $discount_categorie = $this->resource->discount_categorie;
+        if($discount_categorie) {
+            $discount_collect->push($discount_categorie);
+        }
+
+        $discount_brand = $this->resource->discount_brand;
+        if($discount_brand) {
+            $discount_collect->push($discount_brand);
+        }
+
+        if($discount_collect->count() > 0) {
+            $discount_g = $discount_collect->sortByDesc("discount")[0];
+        }
+
         return [
             "id" => $this->resource->id,
             "title" => $this->resource->title,
@@ -62,6 +85,8 @@ class ProductEcommerceResource extends JsonResource
                     "imagen" => env("APP_URL") . "storage/" . $image->imagen,
                 ];
             }),
+            "discount_g" => $discount_g,
+            "discount_collect" => $discount_collect,
         ];
     }
 }
