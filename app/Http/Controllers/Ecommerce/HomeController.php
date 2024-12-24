@@ -9,6 +9,7 @@ use App\Models\Discount\Discount;
 use App\Models\Product\Categorie;
 use App\Models\Product\Product;
 use App\Models\Slider;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 
@@ -50,6 +51,9 @@ class HomeController extends Controller
                     $discount_flash_products->push(ProductEcommerceResource::make($product));
                 }
             }
+
+            // 2024-12-31T23:59:59
+            $discount_flash->end_date_format = Carbon::parse($discount_flash->end_date)->format("M d Y H:i:s");
         }
 
         return response()->json([
