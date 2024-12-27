@@ -32,6 +32,9 @@ class DiscountController extends Controller
      */
     public function store(Request $request)
     {
+        //Crear funcion para que la hora al guardar sea de Bogota Colombia
+        date_default_timezone_set('America/Bogota');
+
         // Validar que los productos o categorias o marcas no se registren dentro del mismo periodo de tiempo
         if ($request->discount_type == 1) { //Validacion a nivel de productos
             foreach ($request->product_selected as $key => $product_selected) {
