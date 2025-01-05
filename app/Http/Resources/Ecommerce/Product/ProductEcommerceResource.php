@@ -37,6 +37,68 @@ class ProductEcommerceResource extends JsonResource
             $discount_g = $discount_collect->sortByDesc("discount")->values()->all()[0];
         }
 
+        $variation_collect = collect([]);
+
+        foreach ($this->resource->variations->groupBy("attribute_id") as $key => $variation_t) {
+
+            $variation_collect->push([
+                "attribute_id" => $variation_t[0]->attribute_id,
+                "attribute" => $variation_t[0]->attribute ? [
+                    "name" => $variation_t[0]->attribute->name,
+                    "type_attribute" => $variation_t[0]->attribute->type_attribute,
+                ] : NULL,
+
+                "details" =>  $variation_t->map(function ($variation) {
+
+                    return [
+                        "id" => $variation->id,
+                        "product_id" => $variation->product_id,
+                        "attribute_id" => $variation->attribute_id,
+                        "attribute" => $variation->attribute ? [
+                            "name" => $variation->attribute->name,
+                            "type_attribute" => $variation->attribute->type_attribute,
+                        ] : NULL,
+                        "propertie_id" => $variation->propertie_id,
+                        "propertie" => $variation->propertie ? [
+                            "name" => $variation->propertie->name,
+                            "code" => $variation->propertie->code,
+                        ] : NULL,
+                        "value_add" => $variation->value_add,
+                        "add_price" => $variation->add_price,
+                        "stock" => $variation->stock,
+                        "state" => $variation->state,
+                        "subvariation" => $variation->variation_children->count() > 0 ? [
+                            "attribute_id" => $variation->variation_children->first()->attribute_id,
+                            "attribute" => $variation->variation_children->first()->attribute ? [
+                                "name" => $variation->variation_children->first()->attribute->name,
+                                "type_attribute" => $variation->variation_children->first()->attribute->type_attribute,
+                            ] : NULL,
+                        ] : null,
+                        "variations" => $variation->variation_children->map(function ($subvariation) {
+                            return [
+                                "id" => $subvariation->id,
+                                "product_id" => $subvariation->product_id,
+                                "attribute_id" => $subvariation->attribute_id,
+                                "attribute" => $subvariation->attribute ? [
+                                    "name" => $subvariation->attribute->name,
+                                    "type_attribute" => $subvariation->attribute->type_attribute,
+                                ] : NULL,
+                                "propertie_id" => $subvariation->propertie_id,
+                                "propertie" => $subvariation->propertie ? [
+                                    "name" => $subvariation->propertie->name,
+                                    "code" => $subvariation->propertie->code,
+                                ] : NULL,
+                                "value_add" => $subvariation->value_add,
+                                "add_price" => $subvariation->add_price,
+                                "stock" => $subvariation->stock,
+                                "state" => $subvariation->state,
+                            ];
+                        }),
+                    ];
+                })
+            ]);
+        }
+
         return [
             "id" => $this->resource->id,
             "title" => $this->resource->title,
@@ -86,46 +148,7 @@ class ProductEcommerceResource extends JsonResource
                 ];
             }),
             "discount_g" => $discount_g,
-            "variations" => $this->resource->variations->map(function ($variation) {
-                return [
-                    "id" => $variation->id,
-                    "product_id" => $variation->product_id,
-                    "attribute_id" => $variation->attribute_id,
-                    "attribute" => $variation->attribute ? [
-                        "name" => $variation->attribute->name,
-                        "type_attribute" => $variation->attribute->type_attribute,
-                    ] : NULL,
-                    "propertie_id" => $variation->propertie_id,
-                    "propertie" => $variation->propertie ? [
-                        "name" => $variation->propertie->name,
-                        "code" => $variation->propertie->code,
-                    ] : NULL,
-                    "value_add" => $variation->value_add,
-                    "add_price" => $variation->add_price,
-                    "stock" => $variation->stock,
-                    "state" => $variation->state,
-                    "variations" => $variation->variation_children->map(function ($subvariation) {
-                        return [
-                            "id" => $subvariation->id,
-                            "product_id" => $subvariation->product_id,
-                            "attribute_id" => $subvariation->attribute_id,
-                            "attribute" => $subvariation->attribute ? [
-                                "name" => $subvariation->attribute->name,
-                                "type_attribute" => $subvariation->attribute->type_attribute,
-                            ] : NULL,
-                            "propertie_id" => $subvariation->propertie_id,
-                            "propertie" => $subvariation->propertie ? [
-                                "name" => $subvariation->propertie->name,
-                                "code" => $subvariation->propertie->code,
-                            ] : NULL,
-                            "value_add" => $subvariation->value_add,
-                            "add_price" => $subvariation->add_price,
-                            "stock" => $subvariation->stock,
-                            "state" => $subvariation->state,
-                        ];
-                    }),
-                ];
-            })
+            "variations" => $variation_collect,
         ];
     }
 }
