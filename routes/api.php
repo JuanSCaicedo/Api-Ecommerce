@@ -72,14 +72,5 @@ Route::group([
     'prefix' => 'ecommerce'
 ], function ($router) {
     Route::get("home", [HomeController::class, "home"]);
-    Route::get("discount_flash", [HomeController::class, "discount_flash"]);
     Route::get("menu", [HomeController::class, "menu"]);
-    Route::get("slider", [HomeController::class, "slider"]);
-    Route::get("slider_secundario", [HomeController::class, "slider_secundario"]);
-    Route::get("slider_products", [HomeController::class, "slider_products"]);
-    Route::get("categories", [HomeController::class, "categories"]);
-    Route::get("products", [HomeController::class, "products"]);
-    Route::get("last_products", [HomeController::class, "last_products"]);
-    Route::get("products_electronics", [HomeController::class, "products_electronics"]);
-    Route::get("products_carusel", [HomeController::class, "products_carusel"]);
 });
