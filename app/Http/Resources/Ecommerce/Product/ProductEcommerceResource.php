@@ -48,7 +48,7 @@ class ProductEcommerceResource extends JsonResource
                     "type_attribute" => $variation_t[0]->attribute->type_attribute,
                 ] : NULL,
 
-                "details" =>  $variation_t->map(function ($variation) {
+                "variations" =>  $variation_t->map(function ($variation) {
 
                     return [
                         "id" => $variation->id,
@@ -71,10 +71,10 @@ class ProductEcommerceResource extends JsonResource
                             "attribute_id" => $variation->variation_children->first()->attribute_id,
                             "attribute" => $variation->variation_children->first()->attribute ? [
                                 "name" => $variation->variation_children->first()->attribute->name,
-                                "type_attribute" => $variation->variation_children->first()->attribute->type_attribute,
+                                "type_attribute" => $variation->variation_children->first()->attribute->type,
                             ] : NULL,
                         ] : null,
-                        "variations" => $variation->variation_children->map(function ($subvariation) {
+                        "subvariations" => $variation->variation_children->map(function ($subvariation) {
                             return [
                                 "id" => $subvariation->id,
                                 "product_id" => $subvariation->product_id,
