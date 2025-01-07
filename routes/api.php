@@ -73,4 +73,5 @@ Route::group([
 ], function ($router) {
     Route::get("home", [HomeController::class, "home"]);
     Route::get("menu", [HomeController::class, "menu"]);
+    Route::get("product/{slug}", [HomeController::class, "show_product"]);
 });
