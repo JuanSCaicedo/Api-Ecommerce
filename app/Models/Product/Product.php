@@ -77,6 +77,11 @@ class Product extends Model
         return $this->hasMany(ProductVariation::class, "product_id")->where("product_variation_id", NULL);
     }
 
+    public function specifications()
+    {
+        return $this->hasMany(ProductSpecification::class, "product_id");
+    }
+
     public function getDiscountCategorieAttribute()
     {
         date_default_timezone_set('America/Bogota');

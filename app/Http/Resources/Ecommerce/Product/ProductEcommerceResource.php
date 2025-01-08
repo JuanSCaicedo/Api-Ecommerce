@@ -156,6 +156,23 @@ class ProductEcommerceResource extends JsonResource
             }),
             "discount_g" => $discount_g,
             "variations" => $variation_collect,
+            "specifications" => $this->resource->specifications->map(function ($specification) {
+                return [
+                    "id" => $specification->id,
+                    "product_id" => $specification->product_id,
+                    "attribute_id" => $specification->attribute_id,
+                    "attribute" => $specification->attribute ? [
+                        "name" => $specification->attribute->name,
+                        "type_attribute" => $specification->attribute->type_attribute,
+                    ] : NULL,
+                    "propertie_id" => $specification->propertie_id,
+                    "propertie" => $specification->propertie ? [
+                        "name" => $specification->propertie->name,
+                        "code" => $specification->propertie->code,
+                    ] : NULL,
+                    "value_add" => $specification->value_add,
+                ];
+            }),
         ];
     }
 }
