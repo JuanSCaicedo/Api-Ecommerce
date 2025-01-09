@@ -146,6 +146,36 @@ class HomeController extends Controller
             "product_last_selling" => ProductEcommerceCollection::make($product_last_selling),
             "product_electronics" => ProductEcommerceCollection::make($product_electronics),
             "product_carusel" => ProductEcommerceCollection::make($product_carusel),
+            "sliders_secundario" => $sliders_secundario->map(function ($slider) {
+                return [
+                    "id" => $slider->id,
+                    "title"  => $slider->title,
+                    "subtitle"  => $slider->subtitle,
+                    "label"  => $slider->label,
+                    "imagen"  => $slider->imagen ? env("APP_URL") . "storage/" . $slider->imagen : NULL,
+                    "link"  => $slider->link,
+                    "state"  => $slider->state,
+                    "color"  => $slider->color,
+                    "type_slider"  => $slider->type_slider,
+                    "price_original"  => $slider->price_original,
+                    "price_campaing" => $slider->price_campaing,
+                ];
+            }),
+            "sliders_products" => $sliders_products->map(function ($slider) {
+                return [
+                    "id" => $slider->id,
+                    "title"  => $slider->title,
+                    "subtitle"  => $slider->subtitle,
+                    "label"  => $slider->label,
+                    "imagen"  => $slider->imagen ? env("APP_URL") . "storage/" . $slider->imagen : NULL,
+                    "link"  => $slider->link,
+                    "state"  => $slider->state,
+                    "color"  => $slider->color,
+                    "type_slider"  => $slider->type_slider,
+                    "price_original"  => $slider->price_original,
+                    "price_campaing" => $slider->price_campaing,
+                ];
+            }),
         ]);
     }
 
