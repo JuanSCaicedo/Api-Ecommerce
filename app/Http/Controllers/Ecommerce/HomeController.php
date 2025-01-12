@@ -210,12 +210,7 @@ class HomeController extends Controller
 
     public function show_product(Request $request, $slug)
     {
-        $campaing_discount = $request->get("campaing_discount");
-
-        if($campaing_discount) {
-            $discount = Discount::where("code", $campaing_discount)->first();
-        }
-
+        // 1. Primero obtener el producto por slug
         $product = Product::where("slug", $slug)->where("state", 2)->first();
 
         if (!$product) {
@@ -225,7 +220,25 @@ class HomeController extends Controller
             ]);
         }
 
-        $product_relateds = Product::where("categorie_first_id", $product->categorie_first_id)->where("id", "!=", $product->id)->where("state", 2)->get();
+        // 2. Obtener el descuento si existe en el request
+        $discount = null;
+        $campaing_discount = $request->get("campaing_discount");
+
+        if ($campaing_discount) {
+            // Buscar el descuento que coincida con el código y que esté relacionado con el producto
+            $discount = Discount::where("code", $campaing_discount)
+                ->whereHas('products', function ($query) use ($product) {
+                    $query->where('product_id', $product->id);
+                })
+                ->where('state', 1)
+                ->first();
+        }
+
+        // 3. Obtener productos relacionados
+        $product_relateds = Product::where("categorie_first_id", $product->categorie_first_id)
+            ->where("id", "!=", $product->id)
+            ->where("state", 2)
+            ->get();
 
         return response()->json([
             "message" => 200,
