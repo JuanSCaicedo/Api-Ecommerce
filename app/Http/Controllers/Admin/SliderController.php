@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Slider;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Cache;
 
 class SliderController extends Controller
 {
@@ -105,7 +106,10 @@ class SliderController extends Controller
                 $request->request->add(["imagen" => $path]);
             }
         }
-        $slider->update($request->all());
+        $slider->update($request->all());  
+        
+        Cache::flush();
+        
         return response()->json(["message" => 200]);
     }
 

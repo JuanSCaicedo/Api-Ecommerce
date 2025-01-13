@@ -20,76 +20,157 @@ class HomeController extends Controller
         date_default_timezone_set("America/Bogota");
 
         // Discount_flash
-        $discount_flash = Discount::where("type_campaing", 2)
-            ->where("state", 1)
-            ->where("start_date", "<=", today())
-            ->where("end_date", ">=", today())
-            ->with(['products.product', 'categories', 'brands'])
-            ->first();
+        if (Cache::has('discount_flash')) {
+            $discount_flash = Cache::get('discount_flash');
+        } else {
+            $discount_flash = Discount::where("type_campaing", 2)
+                ->where("state", 1)
+                ->where("start_date", "<=", today())
+                ->where("end_date", ">=", today())
+                ->with(['products.product', 'categories', 'brands'])
+                ->first();
+            Cache::put('discount_flash', $discount_flash, 60);
+        }
 
+        // Productos de descuento flash
         $discount_flash_products = collect();
 
         if ($discount_flash) {
             // Productos de descuento flash
-            $discount_flash_products = $discount_flash->products->map(function ($product) {
-                return new ProductEcommerceResource($product->product);
-            });
+            if (Cache::has('discount_flash_products')) {
+                $discount_flash_products = Cache::get('discount_flash_products');
+            } else {
+                foreach ($discount_flash->products as $key => $aux_product) {
+                    $discount_flash_products->push(ProductEcommerceResource::make($aux_product->product));
+                }
 
-            // Productos de las categorías del descuento flash
-            $discount_flash->categories->each(function ($category) use (&$discount_flash_products) {
-                $products = Product::where("state", 2)->where("categorie_first_id", $category->categorie_id)->get();
-                $discount_flash_products->push(ProductEcommerceResource::collection($products));
-            });
+                foreach ($discount_flash->categories as $key => $aux_categorie) {
+                    $products_of_categories = Product::where("state", 2)->where("categorie_first_id", $aux_categorie->categorie_id)->get();
+                    foreach ($products_of_categories as $key => $product) {
+                        $discount_flash_products->push(ProductEcommerceResource::make($product));
+                    }
+                }
 
-            // Productos de las marcas del descuento flash
-            $discount_flash->brands->each(function ($brand) use (&$discount_flash_products) {
-                $products = Product::where("state", 2)->where("brand_id", $brand->brand_id)->get();
-                $discount_flash_products->push(ProductEcommerceResource::collection($products));
-            });
+                foreach ($discount_flash->brands as $key => $aux_brand) {
+                    $products_of_brands = Product::where("state", 2)->where("brand_id", $aux_brand->brand_id)->get();
+                    foreach ($products_of_brands as $key => $product) {
+                        $discount_flash_products->push(ProductEcommerceResource::make($product));
+                    }
+                }
+
+                Cache::put('discount_flash_products', $discount_flash_products, 60);
+            }
 
             $discount_flash->end_date_format = Carbon::parse($discount_flash->end_date)->format("M d Y H:i:s");
         }
 
         // Cargar categorías principales para los menús
-        $categories_menus = Categorie::whereNull("categorie_second_id")
-            ->whereNull("categorie_third_id")
-            ->orderBy("position", "desc")
-            ->with(['categorie_seconds.categorie_seconds'])
-            ->get();
+        if (Cache::has('categories_menus')) {
+            $categories_menus = Cache::get('categories_menus');
+        } else {
+            $categories_menus = Categorie::whereNull("categorie_second_id")
+                ->whereNull("categorie_third_id")
+                ->orderBy("position", "desc")
+                ->with(['categorie_seconds.categorie_seconds'])
+                ->get();
+            Cache::put('categories_menus', $categories_menus, 60);
+        }
 
         // Sliders
-        $sliders_secundario = Slider::where("state", 1)->where("type_slider", 2)->orderBy("id", "asc")->get();
-        $sliders_principal = Slider::where("state", 1)->where("type_slider", 1)->orderBy("id", "desc")->get();
-        $sliders_products = Slider::where("state", 1)->where("type_slider", 3)->orderBy("id", "asc")->get();
+        if (Cache::has('sliders_secundario')) {
+            $sliders_secundario = Cache::get('sliders_secundario');
+        } else {
+            $sliders_secundario = Slider::where("state", 1)->where("type_slider", 2)->orderBy("id", "asc")->get();
+            Cache::put('sliders_secundario', $sliders_secundario, 60);
+        }
+
+        if (Cache::has('sliders_principal')) {
+            $sliders_principal = Cache::get('sliders_principal');
+        } else {
+            $sliders_principal = Slider::where("state", 1)->where("type_slider", 1)->orderBy("id", "desc")->get();
+            Cache::put('sliders_principal', $sliders_principal, 60);
+        }
+
+        if (Cache::has('sliders_products')) {
+            $sliders_products = Cache::get('sliders_products');
+        } else {
+            $sliders_products = Slider::where("state", 1)->where("type_slider", 3)->orderBy("id", "asc")->get();
+            Cache::put('sliders_products', $sliders_products, 60);
+        }
 
         // Categorías aleatorias
-        $categories_randoms = Cache::remember('categories_randoms', 60, function () {
-            return Categorie::withCount(["product_categorie_firsts"])
-                ->whereNull("categorie_second_id")
-                ->whereNull("categorie_third_id")
-                ->inRandomOrder()
-                ->limit(5)
-                ->get();
-        });
+        if (Cache::has('categories_randoms')) {
+            $categories_randoms = Cache::get('categories_randoms');
+        } else {
+            $categories_randoms = Categorie::withCount(["product_categorie_firsts"])
+                ->where("categorie_second_id", NULL)
+                ->where("categorie_third_id", NULL)
+                ->inRandomOrder()->limit(5)->get();
+            Cache::put('categories_randoms', $categories_randoms, 60);
+        }
 
-        // Productos aleatorios
-        $product_trending_new = Product::where("state", 2)->inRandomOrder()->limit(8)->get();
-        $product_trending_featured = Product::where("state", 2)->inRandomOrder()->limit(8)->get();
-        $product_trending_top_sellers = Product::where("state", 2)->inRandomOrder()->limit(8)->get();
+        // Productos aleatorios trending
+        if (Cache::has('product_trending_new')) {
+            $product_trending_new = Cache::get('product_trending_new');
+        } else {
+            $product_trending_new = Product::where("state", 2)->inRandomOrder()->limit(8)->get();
+            Cache::put('product_trending_new', $product_trending_new, 60);
+        }
+
+        if (Cache::has('product_trending_featured')) {
+            $product_trending_featured = Cache::get('product_trending_featured');
+        } else {
+            $product_trending_featured = Product::where("state", 2)->inRandomOrder()->limit(8)->get();
+            Cache::put('product_trending_featured', $product_trending_featured, 60);
+        }
+
+        if (Cache::has('product_trending_top_sellers')) {
+            $product_trending_top_sellers = Cache::get('product_trending_top_sellers');
+        } else {
+            $product_trending_top_sellers = Product::where("state", 2)->inRandomOrder()->limit(8)->get();
+            Cache::put('product_trending_top_sellers', $product_trending_top_sellers, 60);
+        }
 
         // Últimos productos
-        $product_last_discounts = Product::where("state", 2)->inRandomOrder()->limit(3)->get();
-        $product_last_featured = Product::where("state", 2)->inRandomOrder()->limit(3)->get();
-        $product_last_selling = Product::where("state", 2)->inRandomOrder()->limit(3)->get();
+        if (Cache::has('product_last_discounts')) {
+            $product_last_discounts = Cache::get('product_last_discounts');
+        } else {
+            $product_last_discounts = Product::where("state", 2)->inRandomOrder()->limit(3)->get();
+            Cache::put('product_last_discounts', $product_last_discounts, 60);
+        }
 
-        // Productos de electrónica
-        $product_electronics = Product::where("state", 2)->where("categorie_first_id", 1)->inRandomOrder()->limit(6)->get();
+        if (Cache::has('product_last_featured')) {
+            $product_last_featured = Cache::get('product_last_featured');
+        } else {
+            $product_last_featured = Product::where("state", 2)->inRandomOrder()->limit(3)->get();
+            Cache::put('product_last_featured', $product_last_featured, 60);
+        }
+
+        if (Cache::has('product_last_selling')) {
+            $product_last_selling = Cache::get('product_last_selling');
+        } else {
+            $product_last_selling = Product::where("state", 2)->inRandomOrder()->limit(3)->get();
+            Cache::put('product_last_selling', $product_last_selling, 60);
+        }
+
+        // Productos de electrónics
+        if (Cache::has('product_electronics')) {
+            $product_electronics = Cache::get('product_electronics');
+        } else {
+            $product_electronics = Product::where("state", 2)->where("categorie_first_id", 1)->inRandomOrder()->limit(6)->get();
+            Cache::put('product_electronics', $product_electronics, 60);
+        }
 
         // Productos de carusel
-        $product_carusel = Product::where("state", 2)
-            ->whereIn("categorie_first_id", $categories_randoms->pluck("id"))
-            ->inRandomOrder()
-            ->get();
+        if (Cache::has('product_carusel')) {
+            $product_carusel = Cache::get('product_carusel');
+        } else {
+            $product_carusel = Product::where("state", 2)
+                ->whereIn("categorie_first_id", $categories_randoms->pluck("id"))
+                ->inRandomOrder()
+                ->get();
+            Cache::put('product_carusel', $product_carusel, 60);
+        }
 
         return response()->json([
             "discount_flash" => $discount_flash,
@@ -149,15 +230,16 @@ class HomeController extends Controller
             "sliders_secundario" => $sliders_secundario->map(function ($slider) {
                 return [
                     "id" => $slider->id,
-                    "title"  => $slider->title,
-                    "subtitle"  => $slider->subtitle,
-                    "label"  => $slider->label,
-                    "imagen"  => $slider->imagen ? env("APP_URL") . "storage/" . $slider->imagen : NULL,
-                    "link"  => $slider->link,
-                    "state"  => $slider->state,
-                    "color"  => $slider->color,
-                    "type_slider"  => $slider->type_slider,
-                    "price_original"  => $slider->price_original,
+                    "title" => $slider->title,
+                    "subtitle" => $slider->subtitle,
+                    "label" => $slider->label,
+                    "imagen" => $slider->imagen ? env("APP_URL") . "storage/" . $slider->imagen : null,
+                    "link" => $slider->link,
+                    "state" => $slider->state,
+                    "color" => $slider->color,
+                    "type_slider" => $slider->type_slider,
+                    "type_width" => $slider->type_width,
+                    "price_original" => $slider->price_original,
                     "price_campaing" => $slider->price_campaing,
                 ];
             }),
