@@ -29,7 +29,7 @@ class HomeController extends Controller
                 ->where("end_date", ">=", today())
                 ->with(['products.product', 'categories', 'brands'])
                 ->first();
-            Cache::put('discount_flash', $discount_flash, 60);
+            Cache::put('discount_flash', $discount_flash);
         }
 
         // Productos de descuento flash
@@ -58,7 +58,7 @@ class HomeController extends Controller
                     }
                 }
 
-                Cache::put('discount_flash_products', $discount_flash_products, 60);
+                Cache::put('discount_flash_products', $discount_flash_products);
             }
 
             $discount_flash->end_date_format = Carbon::parse($discount_flash->end_date)->format("M d Y H:i:s");
@@ -73,7 +73,7 @@ class HomeController extends Controller
                 ->orderBy("position", "desc")
                 ->with(['categorie_seconds.categorie_seconds'])
                 ->get();
-            Cache::put('categories_menus', $categories_menus, 60);
+            Cache::put('categories_menus', $categories_menus);
         }
 
         // Sliders
@@ -81,21 +81,21 @@ class HomeController extends Controller
             $sliders_secundario = Cache::get('sliders_secundario');
         } else {
             $sliders_secundario = Slider::where("state", 1)->where("type_slider", 2)->orderBy("id", "asc")->get();
-            Cache::put('sliders_secundario', $sliders_secundario, 60);
+            Cache::put('sliders_secundario', $sliders_secundario);
         }
 
         if (Cache::has('sliders_principal')) {
             $sliders_principal = Cache::get('sliders_principal');
         } else {
             $sliders_principal = Slider::where("state", 1)->where("type_slider", 1)->orderBy("id", "desc")->get();
-            Cache::put('sliders_principal', $sliders_principal, 60);
+            Cache::put('sliders_principal', $sliders_principal);
         }
 
         if (Cache::has('sliders_products')) {
             $sliders_products = Cache::get('sliders_products');
         } else {
             $sliders_products = Slider::where("state", 1)->where("type_slider", 3)->orderBy("id", "asc")->get();
-            Cache::put('sliders_products', $sliders_products, 60);
+            Cache::put('sliders_products', $sliders_products);
         }
 
         // Categorías aleatorias
@@ -106,7 +106,7 @@ class HomeController extends Controller
                 ->where("categorie_second_id", NULL)
                 ->where("categorie_third_id", NULL)
                 ->inRandomOrder()->limit(5)->get();
-            Cache::put('categories_randoms', $categories_randoms, 60);
+            Cache::put('categories_randoms', $categories_randoms);
         }
 
         // Productos aleatorios trending
@@ -114,21 +114,21 @@ class HomeController extends Controller
             $product_trending_new = Cache::get('product_trending_new');
         } else {
             $product_trending_new = Product::where("state", 2)->inRandomOrder()->limit(8)->get();
-            Cache::put('product_trending_new', $product_trending_new, 60);
+            Cache::put('product_trending_new', $product_trending_new);
         }
 
         if (Cache::has('product_trending_featured')) {
             $product_trending_featured = Cache::get('product_trending_featured');
         } else {
             $product_trending_featured = Product::where("state", 2)->inRandomOrder()->limit(8)->get();
-            Cache::put('product_trending_featured', $product_trending_featured, 60);
+            Cache::put('product_trending_featured', $product_trending_featured);
         }
 
         if (Cache::has('product_trending_top_sellers')) {
             $product_trending_top_sellers = Cache::get('product_trending_top_sellers');
         } else {
             $product_trending_top_sellers = Product::where("state", 2)->inRandomOrder()->limit(8)->get();
-            Cache::put('product_trending_top_sellers', $product_trending_top_sellers, 60);
+            Cache::put('product_trending_top_sellers', $product_trending_top_sellers);
         }
 
         // Últimos productos
@@ -136,21 +136,21 @@ class HomeController extends Controller
             $product_last_discounts = Cache::get('product_last_discounts');
         } else {
             $product_last_discounts = Product::where("state", 2)->inRandomOrder()->limit(3)->get();
-            Cache::put('product_last_discounts', $product_last_discounts, 60);
+            Cache::put('product_last_discounts', $product_last_discounts);
         }
 
         if (Cache::has('product_last_featured')) {
             $product_last_featured = Cache::get('product_last_featured');
         } else {
             $product_last_featured = Product::where("state", 2)->inRandomOrder()->limit(3)->get();
-            Cache::put('product_last_featured', $product_last_featured, 60);
+            Cache::put('product_last_featured', $product_last_featured);
         }
 
         if (Cache::has('product_last_selling')) {
             $product_last_selling = Cache::get('product_last_selling');
         } else {
             $product_last_selling = Product::where("state", 2)->inRandomOrder()->limit(3)->get();
-            Cache::put('product_last_selling', $product_last_selling, 60);
+            Cache::put('product_last_selling', $product_last_selling);
         }
 
         // Productos de electrónics
@@ -158,7 +158,7 @@ class HomeController extends Controller
             $product_electronics = Cache::get('product_electronics');
         } else {
             $product_electronics = Product::where("state", 2)->where("categorie_first_id", 1)->inRandomOrder()->limit(6)->get();
-            Cache::put('product_electronics', $product_electronics, 60);
+            Cache::put('product_electronics', $product_electronics);
         }
 
         // Productos de carusel
@@ -169,7 +169,7 @@ class HomeController extends Controller
                 ->whereIn("categorie_first_id", $categories_randoms->pluck("id"))
                 ->inRandomOrder()
                 ->get();
-            Cache::put('product_carusel', $product_carusel, 60);
+            Cache::put('product_carusel', $product_carusel);
         }
 
         return response()->json([
