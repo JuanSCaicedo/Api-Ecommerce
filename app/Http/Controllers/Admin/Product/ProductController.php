@@ -10,6 +10,7 @@ use App\Models\Product\Categorie;
 use App\Models\Product\Product;
 use App\Models\Product\ProductImage;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
 
@@ -84,6 +85,8 @@ class ProductController extends Controller
 
         $product = Product::create($request->all());
 
+        Cache::flush(); //Limpiar cache
+
         return response()->json([
             "message" => 200,
             "id" => $product->id,  // Include the ID in the response
@@ -102,6 +105,8 @@ class ProductController extends Controller
             "imagen" => $path,
             "product_id" => $product_id,
         ]));
+
+        Cache::flush(); //Limpiar cache
 
         return response()->json([
             "imagen" => [
@@ -155,6 +160,8 @@ class ProductController extends Controller
 
         $product->update($request->all());
 
+        Cache::flush(); //Limpiar cache
+
         return response()->json([
             "message" => 200,
         ]);
@@ -183,6 +190,8 @@ class ProductController extends Controller
         //No se puede eliminar un producto que tenga una venta
         $product->delete();
 
+        Cache::flush(); //Limpiar cache
+
         return response()->json([
             "message" => 200,
         ]);
@@ -198,6 +207,8 @@ class ProductController extends Controller
         }
 
         $product->delete();
+
+        Cache::flush(); //Limpiar cache
 
         return response()->json([
             "message" => 200,

@@ -7,6 +7,7 @@ use App\Http\Resources\Product\CategorieCollection;
 use App\Http\Resources\Product\CategorieResource;
 use App\Models\Product\Categorie;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 
 class CategorieController extends Controller
@@ -56,7 +57,11 @@ class CategorieController extends Controller
             $path = Storage::putFile("categories", $request->file("image"));
             $request->request->add(["imagen" =>  $path]);
         }
+
         $categorie = Categorie::create($request->all());
+
+        Cache::flush(); //Limpiar cache
+
         return response()->json([
             "message" => 200,
             "id" => $categorie->id,  // Include the ID in the response
@@ -98,6 +103,9 @@ class CategorieController extends Controller
                 $request->request->add(["imagen" => $path]);
             }
         }
+
+        Cache::flush(); //Limpiar cache
+
         $categorie->update($request->all());
         return response()->json(["message" => 200]);
     }
@@ -126,6 +134,8 @@ class CategorieController extends Controller
         }
 
         $categorie->delete();
+
+        Cache::flush(); //Limpiar cache
 
         //Validar que la categoria no esté en ningun producto
 

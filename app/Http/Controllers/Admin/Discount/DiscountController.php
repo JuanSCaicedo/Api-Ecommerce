@@ -10,6 +10,7 @@ use App\Models\Discount\DiscountBrand;
 use App\Models\Discount\DiscountCategorie;
 use App\Models\Discount\DiscountProduct;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class DiscountController extends Controller
 {
@@ -131,6 +132,8 @@ class DiscountController extends Controller
                 "brand_id" => $brand_selec["id"],
             ]);
         }
+
+        Cache::flush(); //Limpiar cache
 
         return response()->json([
             "message" => 200,
@@ -270,6 +273,8 @@ class DiscountController extends Controller
             ]);
         }
 
+        Cache::flush(); //Limpiar cache
+
         return response()->json([
             "message" => 200,
             "id" => $discount->id,  // Include the ID in the response
@@ -285,6 +290,8 @@ class DiscountController extends Controller
 
         //Si peretenece a una venta no debe eliminarse
         $discount->delete();
+
+        Cache::flush(); //Limpiar cache
 
         return response()->json([
             "message" => 200,

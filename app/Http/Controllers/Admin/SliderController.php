@@ -55,7 +55,11 @@ class SliderController extends Controller
             $path = Storage::putFile("sliders", $request->file("image"));
             $request->request->add(["imagen" =>  $path]);
         }
+
         $slider = Slider::create($request->all());
+
+        Cache::flush(); //Limpiar cache
+
         return response()->json([
             "message" => 200,
             "id" => $slider->id,  // Include the ID in the response
@@ -106,10 +110,10 @@ class SliderController extends Controller
                 $request->request->add(["imagen" => $path]);
             }
         }
-        $slider->update($request->all());  
-        
-        Cache::flush();
-        
+        $slider->update($request->all());
+
+        Cache::flush(); //Limpiar cache
+
         return response()->json(["message" => 200]);
     }
 
@@ -126,6 +130,8 @@ class SliderController extends Controller
         }
 
         $slider->delete();
+
+        Cache::flush(); //Limpiar cache
 
         return response()->json(["message" => 200]);
     }
