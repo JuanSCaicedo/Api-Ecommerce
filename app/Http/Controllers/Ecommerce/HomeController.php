@@ -309,10 +309,18 @@ class HomeController extends Controller
         if ($campaing_discount) {
             // Buscar el descuento que coincida con el código y que esté relacionado con el producto
             $discount = Discount::where("code", $campaing_discount)
-                ->whereHas('products', function ($query) use ($product) {
-                    $query->where('product_id', $product->id);
-                })
                 ->where('state', 1)
+                ->where(function ($query) use ($product) {
+                    $query->whereHas('products', function ($q) use ($product) {
+                        $q->where('product_id', $product->id);
+                    })
+                        ->orWhereHas('categories', function ($q) use ($product) {
+                            $q->where('categorie_id', $product->categorie_first_id);
+                        })
+                        ->orWhereHas('brands', function ($q) use ($product) {
+                            $q->where('brand_id', $product->brand_id);
+                        });
+                })
                 ->first();
         }
 
