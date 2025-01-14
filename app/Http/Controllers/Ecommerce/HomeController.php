@@ -64,18 +64,6 @@ class HomeController extends Controller
             $discount_flash->end_date_format = Carbon::parse($discount_flash->end_date)->format("M d Y H:i:s");
         }
 
-        // Cargar categorías principales para los menús
-        if (Cache::has('categories_menus')) {
-            $categories_menus = Cache::get('categories_menus');
-        } else {
-            $categories_menus = Categorie::whereNull("categorie_second_id")
-                ->whereNull("categorie_third_id")
-                ->orderBy("position", "desc")
-                ->with(['categorie_seconds.categorie_seconds'])
-                ->get();
-            Cache::put('categories_menus', $categories_menus);
-        }
-
         // Sliders
         if (Cache::has('sliders_secundario')) {
             $sliders_secundario = Cache::get('sliders_secundario');
@@ -105,6 +93,7 @@ class HomeController extends Controller
             $categories_randoms = Categorie::withCount(["product_categorie_firsts"])
                 ->where("categorie_second_id", NULL)
                 ->where("categorie_third_id", NULL)
+                ->where("state", 1)
                 ->inRandomOrder()->limit(5)->get();
             Cache::put('categories_randoms', $categories_randoms);
         }
@@ -175,27 +164,6 @@ class HomeController extends Controller
         return response()->json([
             "discount_flash" => $discount_flash,
             "discount_flash_products" => $discount_flash_products,
-            "categories_menus" => $categories_menus->map(function ($departament) {
-                return [
-                    "id" => $departament->id,
-                    "name" => $departament->name,
-                    "icon" => $departament->icon,
-                    "categories" => $departament->categorie_seconds->map(function ($categorie) {
-                        return [
-                            "id" => $categorie->id,
-                            "name" => $categorie->name,
-                            "imagen" => $categorie->imagen ? env("APP_URL") . "storage/" . $categorie->imagen : null,
-                            "subcategories" => $categorie->categorie_seconds->map(function ($subcategorie) {
-                                return [
-                                    "id" => $subcategorie->id,
-                                    "name" => $subcategorie->name,
-                                    "imagen" => $subcategorie->imagen ? env("APP_URL") . "storage/" . $subcategorie->imagen : null,
-                                ];
-                            }),
-                        ];
-                    }),
-                ];
-            }),
             "sliders_principal" => $sliders_principal->map(function ($slider) {
                 return [
                     "id" => $slider->id,
@@ -263,7 +231,13 @@ class HomeController extends Controller
 
     public function menu(Request $request)
     {
-        $categories_menus = Categorie::where("categorie_second_id", NULL)->where("categorie_third_id", NULL)->orderBy("position", "desc")->get();
+        // Cargar categorías principales para los menús
+        if (Cache::has('categories_menus')) {
+            $categories_menus = Cache::get('categories_menus');
+        } else {
+            $categories_menus = Categorie::where("categorie_second_id", NULL)->where("categorie_third_id", NULL)->orderBy("position", "desc")->where("state", 1)->get();
+            Cache::put('categories_menus', $categories_menus);
+        }
 
         return response()->json([
             "categories_menus" => $categories_menus->map(function ($departament) {
