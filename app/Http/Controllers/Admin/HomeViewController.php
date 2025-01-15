@@ -15,9 +15,10 @@ class HomeViewController extends Controller
     {
         $search = $request->search;
 
-        $home_views = HomeView::where("name", "like", "%" . $search . "%")->get();
+        $home_views = HomeView::where("name", "like", "%" . $search . "%")->paginate(20);
 
         return response()->json([
+            "total" => $home_views->total(),
             "home_views" => $home_views->map(function ($home_view) {
                 return [
                     "id" => $home_view->id,
@@ -50,7 +51,21 @@ class HomeViewController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $isValida = HomeView::where("id", "<>", $id)->where("name", $request->name)->first();
+        if ($isValida) {
+            return response()->json(["message" => 403]);
+        }
+        $homeView = HomeView::findOrFail($id);
+        $homeView->update($request->all());
+        return response()->json([
+            "message" => 200,
+            "homeView" => [
+                "id" => $homeView->id,
+                "name" => $homeView->name,
+                "state" => $homeView->state,
+                "created_at" => $homeView->created_at->format("Y-m-d h:i:s"),
+            ],
+        ]);
     }
 
     /**
