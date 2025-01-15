@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\Cupone\CuponeController;
 use App\Http\Controllers\Admin\Discount\DiscountController;
+use App\Http\Controllers\Admin\HomeViewController;
 use App\Http\Controllers\Admin\Product\AttributeProcutController;
 use App\Http\Controllers\Admin\Product\BrandController;
 use App\Http\Controllers\Admin\Product\CategorieController;
@@ -65,6 +66,8 @@ Route::group([
     Route::resource("cupones", CuponeController::class);
 
     Route::resource("discounts", DiscountController::class);
+
+    Route::resource("home-view", HomeViewController::class);
 });
 
 
