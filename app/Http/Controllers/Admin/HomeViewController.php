@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\HomeView;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class HomeViewController extends Controller
 {
@@ -57,6 +58,9 @@ class HomeViewController extends Controller
         }
         $homeView = HomeView::findOrFail($id);
         $homeView->update($request->all());
+
+        Cache::flush(); //Limpiar cache
+
         return response()->json([
             "message" => 200,
             "homeView" => [

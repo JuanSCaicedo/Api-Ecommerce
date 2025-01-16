@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\Ecommerce\Product\ProductEcommerceCollection;
 use App\Http\Resources\Ecommerce\Product\ProductEcommerceResource;
 use App\Models\Discount\Discount;
+use App\Models\HomeView;
 use App\Models\Product\Categorie;
 use App\Models\Product\Product;
 use App\Models\Slider;
@@ -161,6 +162,8 @@ class HomeController extends Controller
             Cache::put('product_carusel', $product_carusel);
         }
 
+        $homeViews = HomeView::get();
+
         return response()->json([
             "discount_flash" => $discount_flash,
             "discount_flash_products" => $discount_flash_products,
@@ -224,6 +227,13 @@ class HomeController extends Controller
                     "type_slider"  => $slider->type_slider,
                     "price_original"  => $slider->price_original,
                     "price_campaing" => $slider->price_campaing,
+                ];
+            }),
+            "home_views" => $homeViews->map(function ($homeView) {
+                return [
+                    "id" => $homeView->id,
+                    "name" => $homeView->name,
+                    "state" => $homeView->state,
                 ];
             }),
         ]);
