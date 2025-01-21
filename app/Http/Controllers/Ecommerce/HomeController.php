@@ -324,7 +324,7 @@ class HomeController extends Controller
 
     public function homeView()
     {
-        $homeViews = HomeView::get();
+        $homeViews = HomeView::where("name", "vista_mantenimiento")->get();
 
         return response()->json([
             "home_views" => $homeViews->map(function ($homeView) {
