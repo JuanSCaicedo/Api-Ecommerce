@@ -321,4 +321,19 @@ class HomeController extends Controller
             "discount_campaing" => $discount,
         ]);
     }
+
+    public function homeView()
+    {
+        $homeViews = HomeView::get();
+
+        return response()->json([
+            "home_views" => $homeViews->map(function ($homeView) {
+                return [
+                    "id" => $homeView->id,
+                    "name" => $homeView->name,
+                    "state" => $homeView->state,
+                ];
+            }),
+        ]);
+    }
 }
