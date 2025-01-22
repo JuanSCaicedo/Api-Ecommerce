@@ -25,7 +25,7 @@ class HomeViewController extends Controller
                     "id" => $home_view->id,
                     "name" => $home_view->name,
                     "state" => $home_view->state,
-                    "updated_at" => $home_view->updated_at->format("Y-m-d h:i:s"),
+                    "updated_at" => $home_view->updated_at->format("Y-m-d h:i A"),
                 ];
             }),
         ]);
