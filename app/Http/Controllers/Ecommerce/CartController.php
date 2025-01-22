@@ -3,6 +3,10 @@
 namespace App\Http\Controllers\Ecommerce;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\Ecommerce\Cart\CartEcommerceCollection;
+use App\Http\Resources\Ecommerce\Cart\CartEcommerceResource;
+use App\Models\Product\Product;
+use App\Models\Product\ProductVariation;
 use App\Models\Sale\Cart;
 use Illuminate\Http\Request;
 
@@ -18,7 +22,7 @@ class CartController extends Controller
         $carts = Cart::where("user_id", $user->id)->get();
 
         return response()->json([
-            "carts" => $carts
+            "carts" => CartEcommerceCollection::make($carts),
         ]);
     }
 
@@ -37,15 +41,33 @@ class CartController extends Controller
                     "message" => 403,
                     "message_text" => "El producto y la variación ya se encuentra en el carrito, intente modificando la cantidad en el carrito."
                 ]);
+            } else {
+                $variation = ProductVariation::find($request->product_variation_id);
+
+                if ($variation && $variation->stock < $request->quantity) {
+                    return response()->json([
+                        "message" => 403,
+                        "message_text" => "La cantidad solicitada supera el stock disponible."
+                    ]);
+                }
             }
         } else {
-            $is_exist_cart_variations = Cart::where("product_variation_id", NULL)->where("user_id", $user->id)->where("product_id", $request->product_id)->first();
+            $is_exist_cart_simple = Cart::where("product_variation_id", NULL)->where("user_id", $user->id)->where("product_id", $request->product_id)->first();
 
-            if ($is_exist_cart_variations) {
+            if ($is_exist_cart_simple) {
                 return response()->json([
                     "message" => 403,
                     "message_text" => "El producto ya se encuentra en el carrito, intente modificando la cantidad en el carrito."
                 ]);
+            } else {
+                $product = Product::find($request->product_id);
+
+                if ($product && $product->stock < $request->quantity) {
+                    return response()->json([
+                        "message" => 403,
+                        "message_text" => "La cantidad solicitada supera el stock disponible."
+                    ]);
+                }
             }
         }
 
@@ -54,7 +76,7 @@ class CartController extends Controller
         $cart = Cart::create($request->all());
 
         return response()->json([
-            "cart" => $cart
+            "cart" => CartEcommerceResource::make($cart)
         ]);
     }
 
@@ -83,17 +105,35 @@ class CartController extends Controller
                     "message" => 403,
                     "message_text" => "El producto y la variación ya se encuentra en el carrito, intente modificando la cantidad en el carrito."
                 ]);
+            } else {
+                $variation = ProductVariation::find($request->product_variation_id);
+
+                if ($variation && $variation->stock < $request->quantity) {
+                    return response()->json([
+                        "message" => 403,
+                        "message_text" => "La cantidad solicitada supera el stock disponible."
+                    ]);
+                }
             }
         } else {
-            $is_exist_cart_variations = Cart::where("product_variation_id", NULL)
+            $is_exist_cart_simple = Cart::where("product_variation_id", NULL)
                 ->where("user_id", $user->id)->where("product_id", $request->product_id)
                 ->where("id", '<>', $id)->first();
 
-            if ($is_exist_cart_variations) {
+            if ($is_exist_cart_simple) {
                 return response()->json([
                     "message" => 403,
                     "message_text" => "El producto ya se encuentra en el carrito, intente modificando la cantidad en el carrito."
                 ]);
+            } else {
+                $product = Product::find($request->product_id);
+
+                if ($product && $product->stock < $request->quantity) {
+                    return response()->json([
+                        "message" => 403,
+                        "message_text" => "La cantidad solicitada supera el stock disponible."
+                    ]);
+                }
             }
         }
 
@@ -102,7 +142,7 @@ class CartController extends Controller
         $cart->update($request->all());
 
         return response()->json([
-            "cart" => $cart
+            "cart" => CartEcommerceResource::make($cart)
         ]);
     }
 

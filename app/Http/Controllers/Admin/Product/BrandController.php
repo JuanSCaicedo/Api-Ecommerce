@@ -28,7 +28,7 @@ class BrandController extends Controller
                     "id" => $brand->id,
                     "name" => $brand->name,
                     "state" => $brand->state,
-                    "created_at" => $brand->created_at->format("Y-m-d h:i:s"),
+                    "created_at" => $brand->created_at->format("Y-m-d h:i A"),
                 ];
             }),
         ]);
@@ -51,7 +51,7 @@ class BrandController extends Controller
                 "id" => $brand->id,
                 "name" => $brand->name,
                 "state" => $brand->state,
-                "created_at" => $brand->created_at->format("Y-m-d h:i:s"),
+                "created_at" => $brand->created_at->format("Y-m-d h:i A"),
             ],
         ]);
     }
@@ -81,7 +81,7 @@ class BrandController extends Controller
                 "id" => $brand->id,
                 "name" => $brand->name,
                 "state" => $brand->state,
-                "created_at" => $brand->created_at->format("Y-m-d h:i:s"),
+                "created_at" => $brand->created_at->format("Y-m-d h:i A"),
             ],
         ]);
     }

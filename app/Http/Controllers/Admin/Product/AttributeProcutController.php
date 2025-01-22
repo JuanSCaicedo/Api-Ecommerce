@@ -30,7 +30,7 @@ class AttributeProcutController extends Controller
                     "name" => $attribute->name,
                     "type_attribute" => $attribute->type_attribute,
                     "state" => $attribute->state,
-                    "created_at" => $attribute->created_at->format("Y-m-d h:i:s"),
+                    "created_at" => $attribute->created_at->format("Y-m-d h:i A"),
                     "properties" => $attribute->properties->map(function ($propertie) {
                         return [
                             "id" => $propertie->id,
@@ -61,7 +61,7 @@ class AttributeProcutController extends Controller
                 "name" => $attribute->name,
                 "type_attribute" => $attribute->type_attribute,
                 "state" => $attribute->state,
-                "created_at" => $attribute->created_at->format("Y-m-d h:i:s"),
+                "created_at" => $attribute->created_at->format("Y-m-d h:i A"),
                 "properties" => $attribute->properties->map(function ($propertie) {
                     return [
                         "id" => $propertie->id,
@@ -92,7 +92,7 @@ class AttributeProcutController extends Controller
                 "id" => $propertie->id,
                 "name" => $propertie->name,
                 "code" => $propertie->code,
-                "created_at" => $propertie->created_at->format("Y-m-d h:i:s"),
+                "created_at" => $propertie->created_at->format("Y-m-d h:i A"),
             ],
         ]);
     }
@@ -123,7 +123,7 @@ class AttributeProcutController extends Controller
                 "name" => $attribute->name,
                 "type_attribute" => $attribute->type_attribute,
                 "state" => $attribute->state,
-                "created_at" => $attribute->created_at->format("Y-m-d h:i:s"),
+                "created_at" => $attribute->created_at->format("Y-m-d h:i A"),
                 "properties" => $attribute->properties->map(function ($propertie) {
                     return [
                         "id" => $propertie->id,
