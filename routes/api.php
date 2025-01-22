@@ -13,6 +13,7 @@ use App\Http\Controllers\Admin\Product\ProductVariationsController;
 use App\Http\Controllers\Admin\SliderController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\Ecommerce\CartController;
 use App\Http\Controllers\Ecommerce\HomeController;
 
 Route::group([
@@ -78,4 +79,13 @@ Route::group([
     Route::get("menu", [HomeController::class, "menu"]);
     Route::get("homeView", [HomeController::class, "homeView"]);
     Route::get("product/{slug}", [HomeController::class, "show_product"]);
+
+    Route::group(
+        [
+            "middleware" => "auth:api"
+        ],
+        function ($router) {
+            Route::resource("cart", CartController::class);
+        }
+    );
 });
