@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
 use App\Mail\ForgotPasswordMail;
 use App\Models\User;
+use App\Models\UserToken;
 use Illuminate\Support\Facades\Mail;
 use Validator;
 use Carbon\Carbon;
@@ -88,7 +89,7 @@ class AuthController extends Controller
     public function verified_code(Request $request)
     {
         $user = User::where("code_verified", $request->code)->first();
-    
+
         if ($user) {
             // Verificar si la fecha de expiración ha pasado
             if ($user->code_expires_at && Carbon::now()->gt($user->code_expires_at)) {
@@ -100,8 +101,9 @@ class AuthController extends Controller
         }
     }
 
-    public function new_password(Request $request){
-        $user = User::where("code_verified",$request->code)->first();
+    public function new_password(Request $request)
+    {
+        $user = User::where("code_verified", $request->code)->first();
         $user->update([
             "password" => bcrypt($request->new_password),
             "code_verified" => null,
@@ -120,10 +122,23 @@ class AuthController extends Controller
 
         if (!$token = auth('api')->attempt([
             "email" => request()->email,
-            "password" => request()->password, "type_user" => 1
+            "password" => request()->password,
+            "type_user" => 1
         ])) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
+
+        // Obtener User-Agent e IP
+        $userAgent = request()->header('User-Agent');
+        $ip = request()->ip();
+
+        // Almacenar el token en la base de datos con la información adicional
+        UserToken::create([
+            'user_id' => auth('api')->user()->id,
+            'token' => $token,
+            'user_agent' => $userAgent,
+            'ip_address' => $ip,
+        ]);
 
         return $this->respondWithToken($token);
     }
@@ -134,7 +149,8 @@ class AuthController extends Controller
 
         if (!$token = auth('api')->attempt([
             "email" => request()->email,
-            "password" => request()->password, "type_user" => 2
+            "password" => request()->password,
+            "type_user" => 2
         ])) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
@@ -175,10 +191,60 @@ class AuthController extends Controller
      */
     public function logout()
     {
-        auth('api')->logout();
+        try {
+            // Obtenemos el token actual antes de hacer logout
+            $currentToken = auth('api')->getToken();
 
-        return response()->json(['message' => 'Successfully logged out']);
+            // Convertimos el token a string si es necesario
+            $tokenString = (string) $currentToken;
+
+            // Buscamos y eliminamos el token de la tabla
+            UserToken::where('token', $tokenString)->delete();
+
+            // Hacemos logout
+            auth('api')->logout();
+
+            return response()->json(['message' => 'Successfully logged out']);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Error during logout',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
+
+    public function logout_device(Request $request)
+    {
+        $user = UserToken::where("token", $request->token)->first();
+
+        if ($user) {
+            // Guardamos el token actual de autorización
+            $currentToken = auth('api')->getToken();
+
+            try {
+                // Configuramos el token que queremos desloguear
+                auth('api')->setToken($request->token);
+
+                // Hacemos logout de ese token específico
+                auth('api')->logout();
+
+                // Eliminamos el registro de la base de datos
+                $user->delete();
+
+                // Restauramos el token original de autorización
+                auth('api')->setToken($currentToken);
+
+                return response()->json(['message' => 'Successfully logged token out']);
+            } catch (\Exception $e) {
+                // En caso de error, nos aseguramos de restaurar el token original
+                auth('api')->setToken($currentToken);
+                return response()->json(['message' => 'Error logging out token'], 500);
+            }
+        }
+
+        return response()->json(['message' => 'Token not found'], 404);
+    }
+
 
     /**
      * Refresh a token.

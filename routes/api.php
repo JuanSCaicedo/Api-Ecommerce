@@ -26,6 +26,7 @@ Route::group([
     Route::post('/login', [AuthController::class, 'login'])->name('login');
     Route::post('/login_ecommerce', [AuthController::class, 'login_ecommerce'])->name('login_ecommerce');
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+    Route::post('/logout_device', [AuthController::class, 'logout_device'])->name('logout_device');
     Route::post('/refresh', [AuthController::class, 'refresh'])->name('refresh');
     Route::post('/me', [AuthController::class, 'me'])->name('me');
     Route::post('/verified_auth', [AuthController::class, 'verified_auth'])->name('verified_auth');
