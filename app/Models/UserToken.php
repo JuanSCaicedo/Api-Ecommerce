@@ -4,20 +4,24 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class UserToken extends Model
 {
     use HasFactory;
+    use SoftDeletes;
 
     // Definir la tabla asociada al modelo
     protected $table = 'user_tokens';
 
     // Definir los campos que son asignables de forma masiva
     protected $fillable = [
+        'id',
         'user_id',
         'token',
         'user_agent',
-        'ip_address'
+        'ip_address',
+        'expires_at',
     ];
 
     // Definir la relación con el modelo User

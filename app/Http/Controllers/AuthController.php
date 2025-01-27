@@ -132,12 +132,17 @@ class AuthController extends Controller
         $userAgent = request()->header('User-Agent');
         $ip = request()->ip();
 
+        // Obtener el tiempo de expiración en segundos (TTL)
+        $expiresAt = now()->addSeconds(auth('api')->factory()->getTTL() * 60); // Expiración en formato DateTime
+
         // Almacenar el token en la base de datos con la información adicional
         UserToken::create([
+            'id' => uniqid('', true), // Generamos un id único con `uniqid()`
             'user_id' => auth('api')->user()->id,
             'token' => $token,
             'user_agent' => $userAgent,
             'ip_address' => $ip,
+            'expires_at' => $expiresAt,  // Guardamos la fecha de expiración
         ]);
 
         return $this->respondWithToken($token);
