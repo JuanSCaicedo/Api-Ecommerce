@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\Ecommerce\Product;
 
+use App\Models\Discount\Discount;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -18,6 +19,41 @@ class ProductEcommerceResource extends JsonResource
 
         $discount_collect = collect([]);
 
+        // First check if there's an active flash discount
+        // Buscar descuento flash directamente en la base de datos
+        $flash_discount = Discount::where('type_campaing', 2)
+            ->where('state', 1)
+            ->where('start_date', '<=', now())
+            ->where('end_date', '>=', now())
+            ->where(function ($query) {
+                $query->whereHas('products', function ($q) {
+                    $q->where('product_id', $this->resource->id);
+                })
+                    ->orWhereHas('categories', function ($q) {
+                        $q->where('categorie_id', $this->resource->categorie_first_id);
+                    })
+                    ->orWhereHas('brands', function ($q) {
+                        $q->where('brand_id', $this->resource->brand_id);
+                    });
+            })
+            ->first();
+
+        // Si existe un descuento flash aplicable, usarlo
+        if ($flash_discount) {
+            $discount_g = [
+                'id' => $flash_discount->id,
+                'code' => $flash_discount->code,
+                'type_discount' => $flash_discount->type_discount,
+                'discount' => $flash_discount->discount,
+                'start_date' => $flash_discount->start_date,
+                'end_date' => $flash_discount->end_date,
+                'type_campaing' => $flash_discount->type_campaing,
+            ];
+
+            return $this->getFullProductArray($discount_g);
+        }
+
+        // If no flash discount applies, process regular discounts
         $discount_product = $this->resource->discount_product;
         if ($discount_product) {
             $discount_collect->push($discount_product);
@@ -34,9 +70,14 @@ class ProductEcommerceResource extends JsonResource
         }
 
         if ($discount_collect->count() > 0) {
-            $discount_g = $discount_collect->sortByDesc("discount")->values()->all()[0];
+            $discount_g = $discount_collect->sortByDesc("discount")->values()->first();
         }
 
+        return $this->getFullProductArray($discount_g);
+    }
+
+    private function getFullProductArray($discount_g): array
+    {
         $variation_collect = collect([]);
 
         foreach ($this->resource->variations->groupBy("attribute_id") as $key => $variation_t) {
