@@ -20,7 +20,7 @@ class CartController extends Controller
     {
         $user = auth('api')->user();
 
-        $carts = Cart::where("user_id", $user->id)->get();
+        $carts = Cart::where("user_id", $user->id)->orderBy("created_at", "ASC")->get();
 
         return response()->json([
             "carts" => CartEcommerceCollection::make($carts),
