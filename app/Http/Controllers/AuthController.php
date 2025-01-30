@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Mail\verifiedMail;
 use Illuminate\Http\Request;
 
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 use App\Http\Controllers\Controller;
 use App\Mail\ForgotPasswordMail;
 use App\Models\User;
@@ -137,7 +137,7 @@ class AuthController extends Controller
 
         // Almacenar el token en la base de datos con la información adicional
         UserToken::create([
-            'id' => uniqid('', true), // Generamos un id único con `uniqid()`
+            'id' => Str::uuid()->toString(), // Generamos un id único con `uniqid()`
             'user_id' => auth('api')->user()->id,
             'token' => $token,
             'user_agent' => $userAgent,
