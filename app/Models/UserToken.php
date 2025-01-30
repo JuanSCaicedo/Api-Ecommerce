@@ -10,6 +10,8 @@ class UserToken extends Model
 {
     use HasFactory;
     use SoftDeletes;
+    protected $keyType = 'string';
+    public $incrementing = false;
 
     // Definir la tabla asociada al modelo
     protected $table = 'user_tokens';

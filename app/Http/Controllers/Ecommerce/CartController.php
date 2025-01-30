@@ -9,6 +9,7 @@ use App\Models\Product\Product;
 use App\Models\Product\ProductVariation;
 use App\Models\Sale\Cart;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class CartController extends Controller
 {
@@ -71,7 +72,10 @@ class CartController extends Controller
             }
         }
 
-        $request->request->add(["user_id" => $user->id]);
+        $request->request->add([
+            "user_id" => $user->id,
+            "id" => Str::uuid()->toString()
+        ]);
 
         $cart = Cart::create($request->all());
 
