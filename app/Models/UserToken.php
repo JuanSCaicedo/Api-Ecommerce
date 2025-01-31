@@ -4,12 +4,10 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 class UserToken extends Model
 {
     use HasFactory;
-    use SoftDeletes;
     protected $keyType = 'string';
     public $incrementing = false;
 
@@ -20,6 +18,7 @@ class UserToken extends Model
     protected $fillable = [
         'id',
         'user_id',
+        'type_user',
         'token',
         'user_agent',
         'ip_address',

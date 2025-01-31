@@ -139,6 +139,7 @@ class AuthController extends Controller
         UserToken::create([
             'id' => Str::uuid()->toString(), // Generamos un id único con `uniqid()`
             'user_id' => auth('api')->user()->id,
+            'type_user' => auth('api')->user()->type_user,
             'token' => $token,
             'user_agent' => $userAgent,
             'ip_address' => $ip,
@@ -163,6 +164,24 @@ class AuthController extends Controller
         if (!auth('api')->user()->email_verified_at) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
+
+        // Obtener User-Agent e IP
+        $userAgent = request()->header('User-Agent');
+        $ip = request()->ip();
+
+        // Obtener el tiempo de expiración en segundos (TTL)
+        $expiresAt = now()->addSeconds(auth('api')->factory()->getTTL() * 60); // Expiración en formato DateTime
+
+        // Almacenar el token en la base de datos con la información adicional
+        UserToken::create([
+            'id' => Str::uuid()->toString(), // Generamos un id único con `uniqid()`
+            'user_id' => auth('api')->user()->id,
+            'type_user' => auth('api')->user()->type_user,
+            'token' => $token,
+            'user_agent' => $userAgent,
+            'ip_address' => $ip,
+            'expires_at' => $expiresAt,  // Guardamos la fecha de expiración
+        ]);
 
         return $this->respondWithToken($token);
     }
