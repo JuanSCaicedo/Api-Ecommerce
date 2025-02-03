@@ -221,7 +221,7 @@ class HomeController extends Controller
         if (HomeView::where("name", "vista_mantenimiento")->where("state", 1)->exists()) {
             return response()->json(["message" => "El sitio está en mantenimiento"], 503);
         }
-        
+
         // Cargar categorías principales para los menús
         if (Cache::has('categories_menus')) {
             $categories_menus = Cache::get('categories_menus');
@@ -257,6 +257,11 @@ class HomeController extends Controller
 
     public function show_product(Request $request, $slug)
     {
+        // Verifica si la vista de mantenimiento está activada
+        if (HomeView::where("name", "vista_mantenimiento")->where("state", 1)->exists()) {
+            return response()->json(["message" => "El sitio está en mantenimiento"], 503);
+        }
+
         // 1. Primero obtener el producto por slug
         $product = Product::where("slug", $slug)->where("state", 2)->first();
 
@@ -300,15 +305,6 @@ class HomeController extends Controller
             "product" => ProductEcommerceResource::make($product),
             "product_relateds" => ProductEcommerceCollection::make($product_relateds),
             "discount_campaing" => $discount,
-        ]);
-    }
-
-    public function homeView()
-    {
-        $mantinanceState = HomeView::where("name", "vista_mantenimiento")->where("state", 2)->get();
-
-        return response()->json([
-            "home_views" => $mantinanceState,
         ]);
     }
 }
