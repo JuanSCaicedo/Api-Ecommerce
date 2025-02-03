@@ -217,6 +217,11 @@ class HomeController extends Controller
 
     public function menu(Request $request)
     {
+        // Verifica si la vista de mantenimiento está activada
+        if (HomeView::where("name", "vista_mantenimiento")->where("state", 1)->exists()) {
+            return response()->json(["message" => "El sitio está en mantenimiento"], 503);
+        }
+        
         // Cargar categorías principales para los menús
         if (Cache::has('categories_menus')) {
             $categories_menus = Cache::get('categories_menus');
