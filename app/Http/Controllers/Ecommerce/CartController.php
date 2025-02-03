@@ -13,6 +13,11 @@ use Illuminate\Support\Str;
 
 class CartController extends Controller
 {
+    //Funcion para limitar las peticiones a 10 por minuto y bloquear por 1 minuto
+    public function __construct()
+    {
+        $this->middleware('throttle:20,1')->only(['update', 'store', 'destroy']);
+    }
     /**
      * Display a listing of the resource.
      */
