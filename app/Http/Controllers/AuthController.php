@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use App\Http\Controllers\Controller;
 use App\Mail\ForgotPasswordMail;
+use App\Models\HomeView;
 use App\Models\User;
 use App\Models\UserToken;
 use Illuminate\Support\Facades\Mail;
@@ -34,7 +35,6 @@ class AuthController extends Controller
         ]]);
     }
 
-
     /**
      * Register a User.
      *
@@ -42,6 +42,11 @@ class AuthController extends Controller
      */
     public function register()
     {
+        // Verifica si la vista de mantenimiento está activada
+        if (HomeView::where("name", "vista_mantenimiento")->where("state", 1)->exists()) {
+            return response()->json(["message" => "El sitio está en mantenimiento"], 503);
+        }
+
         $validator = Validator::make(request()->all(), [
             'name' => 'required',
             'surname' => 'required',
@@ -72,6 +77,11 @@ class AuthController extends Controller
 
     public function verified_email(Request $request)
     {
+        // Verifica si la vista de mantenimiento está activada
+        if (HomeView::where("name", "vista_mantenimiento")->where("state", 1)->exists()) {
+            return response()->json(["message" => "El sitio está en mantenimiento"], 503);
+        }
+
         $user = User::where("email", $request->email)->first();
 
         if ($user) {
@@ -86,8 +96,14 @@ class AuthController extends Controller
             return response()->json(['message' => 403]);
         }
     }
+    
     public function verified_code(Request $request)
     {
+        // Verifica si la vista de mantenimiento está activada
+        if (HomeView::where("name", "vista_mantenimiento")->where("state", 1)->exists()) {
+            return response()->json(["message" => "El sitio está en mantenimiento"], 503);
+        }
+
         $user = User::where("code_verified", $request->code)->first();
 
         if ($user) {
@@ -103,6 +119,11 @@ class AuthController extends Controller
 
     public function new_password(Request $request)
     {
+        // Verifica si la vista de mantenimiento está activada
+        if (HomeView::where("name", "vista_mantenimiento")->where("state", 1)->exists()) {
+            return response()->json(["message" => "El sitio está en mantenimiento"], 503);
+        }
+
         $user = User::where("code_verified", $request->code)->first();
         $user->update([
             "password" => bcrypt($request->new_password),
@@ -151,6 +172,11 @@ class AuthController extends Controller
 
     public function login_ecommerce()
     {
+        // Verifica si la vista de mantenimiento está activada
+        if (HomeView::where("name", "vista_mantenimiento")->where("state", 1)->exists()) {
+            return response()->json(["message" => "El sitio está en mantenimiento"], 503);
+        }
+
         $credentials = request(['email', 'password']);
 
         if (!$token = auth('api')->attempt([
@@ -188,6 +214,11 @@ class AuthController extends Controller
 
     public function verified_auth(Request $request)
     {
+        // Verifica si la vista de mantenimiento está activada
+        if (HomeView::where("name", "vista_mantenimiento")->where("state", 1)->exists()) {
+            return response()->json(["message" => "El sitio está en mantenimiento"], 503);
+        }
+
         $user = User::where("uniqd", $request->code_user)->first();
 
         if ($user) {
@@ -215,6 +246,11 @@ class AuthController extends Controller
      */
     public function logout()
     {
+        // Verifica si la vista de mantenimiento está activada
+        if (HomeView::where("name", "vista_mantenimiento")->where("state", 1)->exists()) {
+            return response()->json(["message" => "El sitio está en mantenimiento"], 503);
+        }
+
         try {
             // Obtenemos el token actual antes de hacer logout
             $currentToken = auth('api')->getToken();
