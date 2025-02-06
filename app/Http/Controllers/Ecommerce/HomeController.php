@@ -119,7 +119,7 @@ class HomeController extends Controller
                     "id" => $categorie->id,
                     "name" => $categorie->name,
                     "product_categorie_firsts_count" => $categorie->product_categorie_firsts_count,
-                    // "imagen" => $categorie->imagen ? env("APP_URL") . "storage/" . $categorie->imagen : null,
+                    "imagen" => $categorie->imagen ? env("APP_URL") . "storage/" . $categorie->imagen : null,
                 ];
             }),
             "product_trending_new" => ProductEcommerceCollection::make($productTrendingNew),
