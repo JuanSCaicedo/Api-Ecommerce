@@ -86,6 +86,7 @@ Route::group([
         ],
         function ($router) {
             Route::delete("cart/delete_all", [CartController::class, "delete_all"]);
+            Route::post("cart/apply_cupon", [CartController::class, "apply_cupon"]);
             Route::resource("cart", CartController::class);
         }
     );
