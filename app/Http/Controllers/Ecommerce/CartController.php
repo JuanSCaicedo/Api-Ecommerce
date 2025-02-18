@@ -175,10 +175,24 @@ class CartController extends Controller
         if (HomeView::where("name", "vista_mantenimiento")->where("state", 1)->exists()) {
             return response()->json(["message" => "El sitio está en mantenimiento"], 503);
         }
-        
+
         $cart = Cart::findOrFail($id);
 
         $cart->delete();
+
+        return response()->json([
+            "message" => 200,
+        ]);
+    }
+
+    public function delete_all()
+    {
+        $user = auth('api')->user();
+        $carts = Cart::where("user_id", $user->id)->get();
+
+        foreach ($carts as $cart) {
+            $cart->delete();
+        }
 
         return response()->json([
             "message" => 200,
