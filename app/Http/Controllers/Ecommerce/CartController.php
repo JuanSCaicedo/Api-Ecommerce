@@ -118,15 +118,116 @@ class CartController extends Controller
         foreach ($carts as $cart) {
             //Nivel de producto
             if ($cupon->type_cupone == 1) {
+                $is_exist_product_cupon = false;
+
+                foreach ($cupon->products as $cupon_product) {
+                    if ($cupon_product->product_id == $cart->product_id) {
+                        $is_exist_product_cupon = true;
+                        break;
+                    }
+                }
+
+                if ($is_exist_product_cupon) {
+                    $subtotal = 0;
+
+                    //Porcentaje
+                    if ($cupon->type_discount == 1) {
+                        $subtotal = $cart->price_unit - $cart->price_unit * ($cupon->discount * 0.01);
+                    }
+
+                    //Monoto fijo
+                    if ($cupon->type_discount == 2) {
+                        $subtotal = $cart->price_unit - $cupon->discount;
+                    }
+
+                    $cart->update([
+                        "type_discount" => $cupon->type_discount,
+                        "discount" => $cupon->discount,
+                        "code_cupon" => $cupon->code,
+                        "subtotal" => $subtotal,
+                        "total" => $subtotal * $cart->quantity,
+                        "type_campaing" => NULL,
+                        "code_discount" => NULL,
+                    ]);
+                }
             }
 
             //Nivel de categoria          
             if ($cupon->type_cupone == 2) {
+                $is_exist_category_cupon = false;
+
+                foreach ($cupon->categories as $cupon_product) {
+                    if ($cupon_product->categorie_id == $cart->product->categorie_first_id) {
+                        $is_exist_category_cupon = true;
+                        break;
+                    }
+                }
+
+                if ($is_exist_category_cupon) {
+                    $subtotal = 0;
+
+                    //Porcentaje
+                    if ($cupon->type_discount == 1) {
+                        $subtotal = $cart->price_unit - $cart->price_unit * ($cupon->discount * 0.01);
+                    }
+
+                    //Monoto fijo
+                    if ($cupon->type_discount == 2) {
+                        $subtotal = $cart->price_unit - $cupon->discount;
+                    }
+
+                    $cart->update([
+                        "type_discount" => $cupon->type_discount,
+                        "discount" => $cupon->discount,
+                        "code_cupon" => $cupon->code,
+                        "subtotal" => $subtotal,
+                        "total" => $subtotal * $cart->quantity,
+                        "type_campaing" => NULL,
+                        "code_discount" => NULL,
+                    ]);
+                }
             }
 
             //Nivel de marca           
             if ($cupon->type_cupone == 3) {
+                $is_exist_brand_cupon = false;
+
+                foreach ($cupon->brands as $cupon_product) {
+                    if ($cupon_product->brand_id == $cart->product->brand_id) {
+                        $is_exist_brand_cupon = true;
+                        break;
+                    }
+                }
+
+                if ($is_exist_brand_cupon) {
+                    $subtotal = 0;
+
+                    //Porcentaje
+                    if ($cupon->type_discount == 1) {
+                        $subtotal = $cart->price_unit - $cart->price_unit * ($cupon->discount * 0.01);
+                    }
+
+                    //Monoto fijo
+                    if ($cupon->type_discount == 2) {
+                        $subtotal = $cart->price_unit - $cupon->discount;
+                    }
+
+                    $cart->update([
+                        "type_discount" => $cupon->type_discount,
+                        "discount" => $cupon->discount,
+                        "code_cupon" => $cupon->code,
+                        "subtotal" => $subtotal,
+                        "total" => $subtotal * $cart->quantity,
+                        "type_campaing" => NULL,
+                        "code_discount" => NULL,
+                    ]);
+                }
             }
+
+            return response()->json([
+                "message" => 200,
+                "message_text" => "Cupón aplicado correctamente."
+            ]);
         }
     }
 
