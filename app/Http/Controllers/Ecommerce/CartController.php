@@ -112,8 +112,17 @@ class CartController extends Controller
             ]);
         }
 
+        // Verificar si el cupón tiene límite de usos y si aún tiene usos disponibles
+        if ($cupon->type_count == 2 && $cupon->num_use <= 0) {
+            return response()->json([
+                "message" => 403,
+                "message_text" => "El cupón ha alcanzado el límite de usos."
+            ]);
+        }
+
         $user = auth('api')->user();
         $carts = Cart::where("user_id", $user->id)->get();
+        $cupon_applied = false;
 
         foreach ($carts as $cart) {
             //Nivel de producto
@@ -128,27 +137,8 @@ class CartController extends Controller
                 }
 
                 if ($is_exist_product_cupon) {
-                    $subtotal = 0;
-
-                    //Porcentaje
-                    if ($cupon->type_discount == 1) {
-                        $subtotal = $cart->price_unit - $cart->price_unit * ($cupon->discount * 0.01);
-                    }
-
-                    //Monoto fijo
-                    if ($cupon->type_discount == 2) {
-                        $subtotal = $cart->price_unit - $cupon->discount;
-                    }
-
-                    $cart->update([
-                        "type_discount" => $cupon->type_discount,
-                        "discount" => $cupon->discount,
-                        "code_cupon" => $cupon->code,
-                        "subtotal" => $subtotal,
-                        "total" => $subtotal * $cart->quantity,
-                        "type_campaing" => NULL,
-                        "code_discount" => NULL,
-                    ]);
+                    $this->updateCartWithDiscount($cart, $cupon);
+                    $cupon_applied = true;
                 }
             }
 
@@ -164,27 +154,8 @@ class CartController extends Controller
                 }
 
                 if ($is_exist_category_cupon) {
-                    $subtotal = 0;
-
-                    //Porcentaje
-                    if ($cupon->type_discount == 1) {
-                        $subtotal = $cart->price_unit - $cart->price_unit * ($cupon->discount * 0.01);
-                    }
-
-                    //Monoto fijo
-                    if ($cupon->type_discount == 2) {
-                        $subtotal = $cart->price_unit - $cupon->discount;
-                    }
-
-                    $cart->update([
-                        "type_discount" => $cupon->type_discount,
-                        "discount" => $cupon->discount,
-                        "code_cupon" => $cupon->code,
-                        "subtotal" => $subtotal,
-                        "total" => $subtotal * $cart->quantity,
-                        "type_campaing" => NULL,
-                        "code_discount" => NULL,
-                    ]);
+                    $this->updateCartWithDiscount($cart, $cupon);
+                    $cupon_applied = true;
                 }
             }
 
@@ -200,35 +171,49 @@ class CartController extends Controller
                 }
 
                 if ($is_exist_brand_cupon) {
-                    $subtotal = 0;
-
-                    //Porcentaje
-                    if ($cupon->type_discount == 1) {
-                        $subtotal = $cart->price_unit - $cart->price_unit * ($cupon->discount * 0.01);
-                    }
-
-                    //Monoto fijo
-                    if ($cupon->type_discount == 2) {
-                        $subtotal = $cart->price_unit - $cupon->discount;
-                    }
-
-                    $cart->update([
-                        "type_discount" => $cupon->type_discount,
-                        "discount" => $cupon->discount,
-                        "code_cupon" => $cupon->code,
-                        "subtotal" => $subtotal,
-                        "total" => $subtotal * $cart->quantity,
-                        "type_campaing" => NULL,
-                        "code_discount" => NULL,
-                    ]);
+                    $this->updateCartWithDiscount($cart, $cupon);
+                    $cupon_applied = true;
                 }
             }
+        }
 
-            return response()->json([
-                "message" => 200,
-                "message_text" => "Cupón aplicado correctamente."
+        // Si el cupón se aplicó y tiene type_count = 2, decrementar num_use
+        if ($cupon_applied && $cupon->type_count == 2) {
+            $cupon->update([
+                'num_use' => $cupon->num_use - 1
             ]);
         }
+
+        return response()->json([
+            "message" => 200,
+            "message_text" => "Cupón aplicado correctamente."
+        ]);
+    }
+
+    // Método auxiliar para actualizar el carrito con el descuento
+    private function updateCartWithDiscount($cart, $cupon)
+    {
+        $subtotal = 0;
+
+        //Porcentaje
+        if ($cupon->type_discount == 1) {
+            $subtotal = $cart->price_unit - $cart->price_unit * ($cupon->discount * 0.01);
+        }
+
+        //Monto fijo
+        if ($cupon->type_discount == 2) {
+            $subtotal = $cart->price_unit - $cupon->discount;
+        }
+
+        $cart->update([
+            "type_discount" => $cupon->type_discount,
+            "discount" => $cupon->discount,
+            "code_cupon" => $cupon->code,
+            "subtotal" => $subtotal,
+            "total" => $subtotal * $cart->quantity,
+            "type_campaing" => NULL,
+            "code_discount" => NULL,
+        ]);
     }
 
     /**
