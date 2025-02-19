@@ -27,22 +27,34 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             # Navegar al proyecto
-            cd /home/api-ecommerce.juandevops.com/public_html
-
-            # 👉 Ejecutar git pull usando la clave SSH correcta
+            cd /home/api-ecommerce.juandevops.com/public_html || exit 1
+      
+            # Verificar si el repositorio está clonado
+            if [ ! -d ".git" ]; then
+              git clone git@github.com:usuario/repositorio.git .
+            fi
+      
+            # Git pull para actualizar
             sudo GIT_SSH_COMMAND="ssh -i /github-ssh/github-ssh" git pull origin main
-
-            # Instalar dependencias
-            composer update
-
-            # Ajustar permisos del directorio storage
+      
+            # Verificar composer.json antes de instalar dependencias
+            if [ -f "composer.json" ]; then
+              composer install --no-interaction --prefer-dist --optimize-autoloader
+            else
+              echo "composer.json no encontrado" && exit 1
+            fi
+      
+            # Crear carpeta storage si no existe
+            [ ! -d "storage" ] && mkdir -p storage/framework/{cache,sessions,views} storage/logs
+      
+            # Ajustar permisos
             sudo chown -R www-data: storage
             sudo chmod -R 777 storage
-
+      
             # Limpiar cachés de Laravel
             php artisan config:cache
             php artisan route:cache
             php artisan view:cache
-
+      
             # Reiniciar servidor web
-            sudo systemctl restart lsws
+            sudo systemctl restart lsws    
