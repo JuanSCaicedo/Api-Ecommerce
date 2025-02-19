@@ -2,9 +2,9 @@ name: Laravel CI/CD
 
 on:
   push:
-    branches: [ main ]  # Ejecuta en commits a main
+    branches: [ main ]
   pull_request:
-    branches: [ main ]  # También en PRs hacia main
+    branches: [ main ]
 
 concurrency:
   group: ci-${{ github.ref }}
@@ -38,8 +38,8 @@ jobs:
             # Ajustar permisos en el repositorio si es necesario
             sudo chown -R $USER:$USER .git
 
-            # Obtener últimos cambios desde GitHub
-            git pull origin main
+            # 👉 Ejecutar git pull usando la clave SSH correcta
+            sudo GIT_SSH_COMMAND="ssh -i /github-ssh/github-ssh" git pull origin main
 
             # Instalar dependencias
             composer install --no-dev --optimize-autoloader
@@ -54,4 +54,4 @@ jobs:
             php artisan view:cache
 
             # Reiniciar servidor web
-            sudo systemctl restart lsws  # Cambia a nginx o apache2 si aplica
+            sudo systemctl restart lsws
