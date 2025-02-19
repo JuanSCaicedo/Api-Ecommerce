@@ -1,0 +1,47 @@
+name: Laravel CI/CD
+
+on:
+  push:
+    branches: [ main ]  # Ejecuta en commits a main
+  pull_request:
+    branches: [ main ]  # También en PRs hacia main
+
+concurrency:
+  group: ci-${{ github.ref }}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1️⃣ Clonar repositorio (para entorno de GitHub Actions)
+      - name: Clonar repositorio
+        uses: actions/checkout@v3
+
+      # 2️⃣ Conectar al servidor y actualizar la API
+      - name: Actualizar API Laravel
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd /home/api-ecommerce.juandevops.com/public_html
+
+            # 3️⃣ Obtener últimos cambios desde GitHub
+            git pull origin main
+
+            # 4️⃣ Instalar dependencias
+            composer install --no-dev --optimize-autoloader
+
+            # 5️⃣ Ajustar permisos del directorio storage
+            sudo chown -R www-data: storage
+            sudo chmod -R 777 storage
+
+            # 6️⃣ (Opcional) Limpiar cachés de Laravel
+            php artisan config:cache
+            php artisan route:cache
+            php artisan view:cache
+
+            # 7️⃣ Reiniciar servidor web (si es necesario)
+            sudo systemctl restart lsws  # Cambia a nginx o apache2 si aplica
