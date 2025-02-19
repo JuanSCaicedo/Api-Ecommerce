@@ -42,7 +42,7 @@ jobs:
             sudo GIT_SSH_COMMAND="ssh -i /github-ssh/github-ssh" git pull origin main
 
             # Instalar dependencias
-            composer install --no-dev --optimize-autoloader
+            composer update --no-interaction --no-suggest
 
             # Ajustar permisos del directorio storage
             sudo chown -R www-data: storage
