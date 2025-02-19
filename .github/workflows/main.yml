@@ -29,7 +29,7 @@ jobs:
             cd /home/api-ecommerce.juandevops.com/public_html
 
             # 3️⃣ Obtener últimos cambios desde GitHub
-            git pull origin main
+            sudo git pull origin main
 
             # 4️⃣ Instalar dependencias
             composer install --no-dev --optimize-autoloader
