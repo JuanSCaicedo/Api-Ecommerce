@@ -26,25 +26,32 @@ jobs:
           username: ${{ secrets.SERVER_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
+            # Navegar al proyecto
             cd /home/api-ecommerce.juandevops.com/public_html
-      
-            # Configurar Git con el token
-            git config --global url."https://${{ secrets.GH_PAT }}@github.com/".insteadOf "https://github.com/"
-      
-            # Obtener últimos cambios
+
+            # Asegurar que el repositorio usa SSH
+            git remote set-url origin git@github.com:JuanSCaicedo/Api-Ecommerce.git
+
+            # Agregar GitHub al known_hosts para evitar el prompt de autenticación
+            ssh-keyscan github.com >> ~/.ssh/known_hosts
+
+            # Ajustar permisos en el repositorio si es necesario
+            sudo chown -R $USER:$USER .git
+
+            # Obtener últimos cambios desde GitHub
             git pull origin main
-      
+
             # Instalar dependencias
             composer install --no-dev --optimize-autoloader
-      
+
             # Ajustar permisos del directorio storage
             sudo chown -R www-data: storage
             sudo chmod -R 777 storage
-      
+
             # Limpiar cachés de Laravel
             php artisan config:cache
             php artisan route:cache
             php artisan view:cache
-      
-            # Reiniciar servidor web si es necesario
-            sudo systemctl restart lsws    
+
+            # Reiniciar servidor web
+            sudo systemctl restart lsws  # Cambia a nginx o apache2 si aplica
