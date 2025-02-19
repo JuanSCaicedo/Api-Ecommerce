@@ -186,7 +186,7 @@ class CartController extends Controller
 
         return response()->json([
             "message" => 200,
-            "message_text" => "Cupón aplicado correctamente."
+            "message_text" => "Cupón aplicado correctamente!."
         ]);
     }
 

@@ -14,9 +14,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1️⃣ Clonar repositorio (para entorno de GitHub Actions)
-      - name: Clonar repositorio
-        uses: actions/checkout@v3
 
       # 2️⃣ Conectar al servidor y actualizar la API
       - name: Actualizar API Laravel
@@ -28,15 +25,6 @@ jobs:
           script: |
             # Navegar al proyecto
             cd /home/api-ecommerce.juandevops.com/public_html
-
-            # Asegurar que el repositorio usa SSH
-            git remote set-url origin git@github.com:JuanSCaicedo/Api-Ecommerce.git
-
-            # Agregar GitHub al known_hosts para evitar el prompt de autenticación
-            ssh-keyscan github.com >> ~/.ssh/known_hosts
-
-            # Ajustar permisos en el repositorio si es necesario
-            sudo chown -R $USER:$USER .git
 
             # 👉 Ejecutar git pull usando la clave SSH correcta
             sudo GIT_SSH_COMMAND="ssh -i /github-ssh/github-ssh" git pull origin main
