@@ -63,4 +63,8 @@ jobs:
           username: ${{ secrets.SERVER_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
+            # Navegar al proyecto
+            cd /home/api-ecommerce.juandevops.com/public_html
+
+            # Actualizar dependencias
             composer update
