@@ -14,13 +14,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 🔑 Clonar el repositorio correctamente
-      - name: Checkout repository
+      # 1️⃣ Clonar repositorio (para entorno de GitHub Actions)
+      - name: Clonar repositorio
         uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
 
-      # 📂 Conectar al servidor y actualizar la API
+      # 2️⃣ Conectar al servidor y actualizar la API
       - name: Actualizar API Laravel
         uses: appleboy/ssh-action@v1.0.3
         with:
@@ -31,31 +29,29 @@ jobs:
             # Navegar al proyecto
             cd /home/api-ecommerce.juandevops.com/public_html
 
-            # ✅ Verificar y ajustar permisos del archivo SSH
-            sudo chmod 600 /github-ssh/github-ssh
+            # Asegurar que el repositorio usa SSH
+            git remote set-url origin git@github.com:JuanSCaicedo/Api-Ecommerce.git
 
-            # ✅ Corregir permisos del repositorio
+            # Agregar GitHub al known_hosts para evitar el prompt de autenticación
+            ssh-keyscan github.com >> ~/.ssh/known_hosts
+
+            # Ajustar permisos en el repositorio si es necesario
             sudo chown -R $USER:$USER .git
 
             # 👉 Ejecutar git pull usando la clave SSH correcta
-            GIT_SSH_COMMAND="ssh -i /github-ssh/github-ssh" git pull origin main
+            sudo GIT_SSH_COMMAND="ssh -i /github-ssh/github-ssh" git pull origin main
 
-            # 📦 Instalar dependencias
-            composer install --no-interaction --prefer-dist --optimize-autoloader
+            # Instalar dependencias
+            composer install --no-dev --optimize-autoloader
 
-            # ✅ Ajustar permisos del directorio storage y cache
-            sudo chown -R www-data:www-data storage bootstrap/cache
-            sudo chmod -R 775 storage bootstrap/cache
+            # Ajustar permisos del directorio storage
+            sudo chown -R www-data: storage
+            sudo chmod -R 777 storage
 
-            # ✅ Ajustar permisos del archivo de logs
-            sudo touch storage/logs/laravel.log
-            sudo chown -R www-data:www-data storage/logs
-            sudo chmod -R 775 storage/logs
-
-            # 🔄 Limpiar cachés de Laravel
+            # Limpiar cachés de Laravel
             php artisan config:cache
             php artisan route:cache
             php artisan view:cache
 
-            # ♻️ Reiniciar servidor web (LiteSpeed)
+            # Reiniciar servidor web
             sudo systemctl restart lsws
