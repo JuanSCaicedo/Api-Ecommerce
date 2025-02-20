@@ -14,9 +14,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1️⃣ Clonar repositorio (para entorno de GitHub Actions)
-      - name: Clonar repositorio
-        uses: actions/checkout@v3
 
       # 2️⃣ Conectar al servidor y actualizar la API
       - name: Actualizar API Laravel
@@ -33,6 +30,7 @@ jobs:
             sudo GIT_SSH_COMMAND="ssh -i /github-ssh/github-ssh" git pull origin main
 
             # Instalar dependencias
+            composer install
             composer update
 
             # Ajustar permisos del directorio storage
