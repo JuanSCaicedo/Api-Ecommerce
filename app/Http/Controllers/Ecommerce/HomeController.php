@@ -10,18 +10,22 @@ use App\Models\HomeView;
 use App\Models\Product\Categorie;
 use App\Models\Product\Product;
 use App\Models\Slider;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 
 class HomeController extends Controller
 {
+    private const CACHE_DURATION = 3600; // 1 hour
+    private const CACHE_DURATION_DAILY = 86400; // 24 hours
+
     public function home(Request $request)
     {
         date_default_timezone_set("America/Bogota");
 
         $cacheKey = 'home_response_' . now()->format('Y-m-d_H');
 
-        return Cache::remember($cacheKey, 3600, function () {
+        return Cache::remember($cacheKey, self::CACHE_DURATION, function () {
             if ($this->isUnderMaintenance()) {
                 return response()->json(["message" => "El sitio está en mantenimiento"], 503);
             }
@@ -29,27 +33,9 @@ class HomeController extends Controller
             $discountFlash = $this->getCachedData('discount_flash', fn() => $this->getDiscountFlash());
             $discountFlashProducts = $this->getDiscountFlashProducts($discountFlash);
 
-            $sliders = [
-                'principal' => $this->getCachedSliders(1),
-                'secundario' => $this->getCachedSliders(2),
-                'products' => $this->getCachedSliders(3),
-            ];
-
-            $categoriesRandom = $this->getCachedData('categories_randoms', fn() => $this->getRandomCategories());
-
-            $productSections = [
-                'trending_new' => $this->getCachedRandomProducts('product_trending_new'),
-                'trending_featured' => $this->getCachedRandomProducts('product_trending_featured'),
-                'trending_top_sellers' => $this->getCachedRandomProducts('product_trending_top_sellers'),
-                'last_discounts' => $this->getCachedRandomProducts('product_last_discounts', 3),
-                'last_featured' => $this->getCachedRandomProducts('product_last_featured', 3),
-                'last_selling' => $this->getCachedRandomProducts('product_last_selling', 3),
-            ];
-
-            $productElectronics = $this->getCachedData('product_electronics', fn() => $this->getElectronicsProducts());
-
-            $productCarusel = $this->getCachedData('product_carusel', fn() => $this->getCaruselProducts($categoriesRandom));
-
+            $sliders = $this->getAllSliders();
+            $categoriesRandom = $this->getCachedRandomCategories();
+            $products = $this->getAllProductSections();
             $homeViews = HomeView::all();
 
             return response()->json([
@@ -59,19 +45,44 @@ class HomeController extends Controller
                 "sliders_secundario" => $this->formatSliders($sliders['secundario']),
                 "sliders_products" => $this->formatSliders($sliders['products']),
                 "categories_randoms" => $this->formatCategories($categoriesRandom),
-                "product_trending_new" => ProductEcommerceCollection::make($productSections['trending_new']),
-                "product_trending_featured" => ProductEcommerceCollection::make($productSections['trending_featured']),
-                "product_trending_top_sellers" => ProductEcommerceCollection::make($productSections['trending_top_sellers']),
-                "product_last_discounts" => ProductEcommerceCollection::make($productSections['last_discounts']),
-                "product_last_featured" => ProductEcommerceCollection::make($productSections['last_featured']),
-                "product_last_selling" => ProductEcommerceCollection::make($productSections['last_selling']),
-                "product_electronics" => ProductEcommerceCollection::make($productElectronics),
-                "product_carusel" => ProductEcommerceCollection::make($productCarusel),
-                "home_views" => $homeViews->map(fn($view) => [
-                    "id" => $view->id,
-                    "name" => $view->name,
-                    "state" => $view->state,
-                ]),
+                "product_trending_new" => ProductEcommerceCollection::make($products['trending_new']),
+                "product_trending_featured" => ProductEcommerceCollection::make($products['trending_featured']),
+                "product_trending_top_sellers" => ProductEcommerceCollection::make($products['trending_top_sellers']),
+                "product_last_discounts" => ProductEcommerceCollection::make($products['last_discounts']),
+                "product_last_featured" => ProductEcommerceCollection::make($products['last_featured']),
+                "product_last_selling" => ProductEcommerceCollection::make($products['last_selling']),
+                "product_electronics" => ProductEcommerceCollection::make($products['electronics']),
+                "product_carusel" => ProductEcommerceCollection::make($products['carusel']),
+                "home_views" => $this->formatHomeViews($homeViews),
+            ]);
+        });
+    }
+
+    public function show_product(Request $request, $slug)
+    {
+        $cacheKey = "product_{$slug}_" . ($request->get("campaing_discount") ?? 'no_discount');
+
+        return Cache::remember($cacheKey, self::CACHE_DURATION, function () use ($request, $slug) {
+            if ($this->isUnderMaintenance()) {
+                return response()->json(["message" => "El sitio está en mantenimiento"], 503);
+            }
+
+            $product = $this->getProduct($slug);
+            if (!$product) {
+                return response()->json([
+                    "message" => 403,
+                    "message_text" => "Producto no encontrado",
+                ]);
+            }
+
+            $discount = $this->getProductDiscount($product, $request->get("campaing_discount"));
+            $relatedProducts = $this->getRelatedProducts($product);
+
+            return response()->json([
+                "message" => 200,
+                "product" => ProductEcommerceResource::make($product),
+                "product_relateds" => ProductEcommerceCollection::make($relatedProducts),
+                "discount_campaing" => $discount,
             ]);
         });
     }
@@ -80,67 +91,28 @@ class HomeController extends Controller
     {
         $cacheKey = 'menu_response_' . now()->format('Y-m-d');
 
-        return Cache::remember($cacheKey, 86400, function () {
+        return Cache::remember($cacheKey, self::CACHE_DURATION_DAILY, function () {
             if ($this->isUnderMaintenance()) {
                 return response()->json(["message" => "El sitio está en mantenimiento"], 503);
             }
 
-            $categoriesMenus = Categorie::with(['categorie_seconds.categorie_seconds'])
-                ->whereNull("categorie_second_id")
-                ->whereNull("categorie_third_id")
-                ->where("state", 1)
-                ->orderBy("position", "desc")
-                ->get();
-
+            $categoriesMenus = $this->getCachedMenuCategories();
             return response()->json([
-                "categories_menus" => $categoriesMenus->map(fn($dept) => [
-                    "id" => $dept->id,
-                    "name" => $dept->name,
-                    "icon" => $dept->icon,
-                    "categories" => $dept->categorie_seconds->map(fn($cat) => [
-                        "id" => $cat->id,
-                        "name" => $cat->name,
-                        "imagen" => $cat->imagen ? env("APP_URL") . "storage/" . $cat->imagen : null,
-                        "subcategories" => $cat->categorie_seconds->map(fn($subcat) => [
-                            "id" => $subcat->id,
-                            "name" => $subcat->name,
-                            "imagen" => $subcat->imagen ? env("APP_URL") . "storage/" . $subcat->imagen : null,
-                        ]),
-                    ]),
-                ]),
+                "categories_menus" => $this->formatMenuCategories($categoriesMenus)
             ]);
         });
     }
 
     private function isUnderMaintenance()
     {
-        return HomeView::where("name", "vista_mantenimiento")->where("state", 1)->exists();
+        return Cache::remember('maintenance_status', 300, function () {
+            return HomeView::where("name", "vista_mantenimiento")->where("state", 1)->exists();
+        });
     }
 
-    private function getCachedData($key, $callback)
+    private function getCachedData($key, $callback, $duration = self::CACHE_DURATION)
     {
-        return Cache::remember($key, 3600, $callback);
-    }
-
-    private function getCachedRandomProducts($key, $limit = 6)
-    {
-        return $this->getCachedData($key, fn() => Product::where("state", 2)->inRandomOrder()->limit($limit)->get());
-    }
-
-    private function getCachedSliders($type)
-    {
-        return $this->getCachedData("sliders_type_$type", fn() => Slider::where("state", 1)->where("type_slider", $type)->orderBy("id", "desc")->get());
-    }
-
-    private function getRandomCategories()
-    {
-        return Categorie::withCount(["product_categorie_firsts"])
-            ->whereNull("categorie_second_id")
-            ->whereNull("categorie_third_id")
-            ->where("state", 1)
-            ->inRandomOrder()
-            ->limit(5)
-            ->get();
+        return Cache::remember($key, $duration, $callback);
     }
 
     private function getDiscountFlash()
@@ -149,42 +121,156 @@ class HomeController extends Controller
             ->where("state", 1)
             ->where("start_date", "<=", today())
             ->where("end_date", ">=", today())
-            ->with(['products.product' => fn($query) => $query->select('id', 'name', 'price', 'stock', 'state')->where('state', 2)])
+            ->with(['products.product', 'categories', 'brands'])
             ->first();
     }
 
     private function getDiscountFlashProducts($discountFlash)
     {
-        return $discountFlash ? $discountFlash->products->pluck('product') : collect();
+        if (!$discountFlash) return collect();
+
+        return Cache::remember('discount_flash_products', self::CACHE_DURATION, function () use ($discountFlash) {
+            $products = collect();
+
+            // Productos directos
+            $products = $products->merge($discountFlash->products->pluck('product'));
+
+            // Productos por categoría
+            foreach ($discountFlash->categories as $category) {
+                $products = $products->merge(
+                    Product::where("state", 2)
+                        ->where("categorie_first_id", $category->categorie_id)
+                        ->get()
+                );
+            }
+
+            // Productos por marca
+            foreach ($discountFlash->brands as $brand) {
+                $products = $products->merge(
+                    Product::where("state", 2)
+                        ->where("brand_id", $brand->brand_id)
+                        ->get()
+                );
+            }
+
+            return $products->unique('id');
+        });
     }
 
-    private function getElectronicsProducts()
+    private function getAllSliders()
     {
-        return Product::where("state", 2)
-            ->where("categorie_first_id", 1)
-            ->select('id', 'name', 'price', 'stock', 'state', 'categorie_first_id')
-            ->inRandomOrder()
-            ->limit(6)
-            ->get();
+        return [
+            'principal' => $this->getCachedData("sliders_principal", fn() => Slider::where("state", 1)->where("type_slider", 1)->orderBy("id", "desc")->get()),
+            'secundario' => $this->getCachedData("sliders_secundario", fn() => Slider::where("state", 1)->where("type_slider", 2)->orderBy("id", "asc")->get()),
+            'products' => $this->getCachedData("sliders_products", fn() => Slider::where("state", 1)->where("type_slider", 3)->orderBy("id", "asc")->get()),
+        ];
     }
 
-    private function getCaruselProducts($categoriesRandom)
+    private function getCachedRandomCategories()
     {
-        return Product::where("state", 2)
-            ->whereIn("categorie_first_id", $categoriesRandom->pluck("id"))
-            ->select('id', 'name', 'price', 'stock', 'state', 'categorie_first_id')
-            ->inRandomOrder()
-            ->get();
+        return $this->getCachedData('categories_randoms', function () {
+            return Categorie::withCount(["product_categorie_firsts"])
+                ->whereNull(["categorie_second_id", "categorie_third_id"])
+                ->where("state", 1)
+                ->inRandomOrder()
+                ->limit(5)
+                ->get();
+        });
     }
 
+    private function getAllProductSections()
+    {
+        $categoriesRandom = $this->getCachedRandomCategories();
+
+        return [
+            'trending_new' => $this->getCachedRandomProducts('trending_new', 8),
+            'trending_featured' => $this->getCachedRandomProducts('trending_featured', 8),
+            'trending_top_sellers' => $this->getCachedRandomProducts('trending_top_sellers', 8),
+            'last_discounts' => $this->getCachedRandomProducts('last_discounts', 3),
+            'last_featured' => $this->getCachedRandomProducts('last_featured', 3),
+            'last_selling' => $this->getCachedRandomProducts('last_selling', 3),
+            'electronics' => $this->getCachedData('electronics', fn() => 
+                Product::where("state", 2)
+                    ->where("categorie_first_id", 1)
+                    ->inRandomOrder()
+                    ->limit(6)
+                    ->get()
+            ),
+            'carusel' => $this->getCachedData('carusel', fn() => 
+                Product::where("state", 2)
+                    ->whereIn("categorie_first_id", $categoriesRandom->pluck("id"))
+                    ->inRandomOrder()
+                    ->get()
+            ),
+        ];
+    }
+
+    private function getCachedRandomProducts($key, $limit)
+    {
+        return $this->getCachedData("products_{$key}", fn() => 
+            Product::where("state", 2)
+                ->inRandomOrder()
+                ->limit($limit)
+                ->get()
+        );
+    }
+
+    private function getProduct($slug)
+    {
+        return Product::where("slug", $slug)
+            ->where("state", 2)
+            ->first();
+    }
+
+    private function getProductDiscount($product, $campaingCode)
+    {
+        if (!$campaingCode) return null;
+
+        return Discount::where("code", $campaingCode)
+            ->where('state', 1)
+            ->where(function ($query) use ($product) {
+                $query->whereHas('products', function ($q) use ($product) {
+                    $q->where('product_id', $product->id);
+                })
+                ->orWhereHas('categories', function ($q) use ($product) {
+                    $q->where('categorie_id', $product->categorie_first_id);
+                })
+                ->orWhereHas('brands', function ($q) use ($product) {
+                    $q->where('brand_id', $product->brand_id);
+                });
+            })
+            ->first();
+    }
+
+    private function getRelatedProducts($product)
+    {
+        return $this->getCachedData("related_products_{$product->id}", fn() =>
+            Product::where("categorie_first_id", $product->categorie_first_id)
+                ->where("id", "!=", $product->id)
+                ->where("state", 2)
+                ->limit(8)
+                ->get()
+        );
+    }
+
+    private function getCachedMenuCategories()
+    {
+        return $this->getCachedData('menu_categories', fn() =>
+            Categorie::with(['categorie_seconds.categorie_seconds'])
+                ->whereNull(["categorie_second_id", "categorie_third_id"])
+                ->where("state", 1)
+                ->orderBy("position", "desc")
+                ->get()
+        , self::CACHE_DURATION_DAILY);
+    }
+
+    // Formatting methods
     private function formatDiscountFlash($discountFlash)
     {
-        return $discountFlash ? [
-            "id" => $discountFlash->id,
-            "title" => $discountFlash->title,
-            "start_date" => $discountFlash->start_date,
-            "end_date" => $discountFlash->end_date,
-        ] : null;
+        if (!$discountFlash) return null;
+        
+        $discountFlash->end_date_format = Carbon::parse($discountFlash->end_date)->format("M d Y H:i:s");
+        return $discountFlash;
     }
 
     private function formatSliders($sliders)
@@ -212,6 +298,34 @@ class HomeController extends Controller
             "name" => $cat->name,
             "product_categorie_firsts_count" => $cat->product_categorie_firsts_count,
             "imagen" => $cat->imagen ? env("APP_URL") . "storage/" . $cat->imagen : null,
+        ]);
+    }
+
+    private function formatHomeViews($views)
+    {
+        return $views->map(fn($view) => [
+            "id" => $view->id,
+            "name" => $view->name,
+            "state" => $view->state,
+        ]);
+    }
+
+    private function formatMenuCategories($categories)
+    {
+        return $categories->map(fn($dept) => [
+            "id" => $dept->id,
+            "name" => $dept->name,
+            "icon" => $dept->icon,
+            "categories" => $dept->categorie_seconds->map(fn($cat) => [
+                "id" => $cat->id,
+                "name" => $cat->name,
+                "imagen" => $cat->imagen ? env("APP_URL") . "storage/" . $cat->imagen : null,
+                "subcategories" => $cat->categorie_seconds->map(fn($subcat) => [
+                    "id" => $subcat->id,
+                    "name" => $subcat->name,
+                    "imagen" => $subcat->imagen ? env("APP_URL") . "storage/" . $subcat->imagen : null,
+                ]),
+            ]),
         ]);
     }
 }
