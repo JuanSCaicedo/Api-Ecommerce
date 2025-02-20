@@ -42,9 +42,6 @@ jobs:
             # Instalar dependencias
             composer install --no-interaction --prefer-dist --optimize-autoloader
 
-            # Ejecutar migraciones si es necesario
-            php artisan migrate --force
-
             # Ajustar permisos del directorio storage y cache
             sudo chown -R www-data: storage bootstrap/cache
             sudo chmod -R 775 storage bootstrap/cache
