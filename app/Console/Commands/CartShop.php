@@ -2,8 +2,10 @@
 
 namespace App\Console\Commands;
 
+use App\Mail\CartAbandoned;
 use App\Models\User;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Mail;
 
 class CartShop extends Command
 {
@@ -38,6 +40,8 @@ class CartShop extends Command
                     "updated_at" => now(),
                 ]);
             }
+
+            Mail::to($user->email)->send(new CartAbandoned($user, $user->carts));
         }
     }
 }
