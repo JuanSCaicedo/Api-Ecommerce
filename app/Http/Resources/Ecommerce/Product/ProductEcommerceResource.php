@@ -154,7 +154,7 @@ class ProductEcommerceResource extends JsonResource
             "price_cop" => $this->resource->price_cop,
             "price_usd" => $this->resource->price_usd,
             "resumen" => $this->resource->resumen,
-            // "imagen" => $this->resource->imagen ? env("APP_URL") . "storage/" . $this->resource->imagen : NULL,
+            "imagen" => $this->resource->imagen ? env("APP_URL") . "storage/" . $this->resource->imagen : NULL,
             "state" => $this->resource->state,
             "description" => $this->resource->description,
             "tags" => $this->resource->tags ? json_decode($this->resource->tags) : [],
@@ -192,7 +192,7 @@ class ProductEcommerceResource extends JsonResource
             "images" => $this->resource->images->map(function ($image) {
                 return [
                     "id" => $image->id,
-                    // "imagen" => env("APP_URL") . "storage/" . $image->imagen,
+                    "imagen" => env("APP_URL") . "storage/" . $image->imagen,
                 ];
             }),
             "discount_g" => $discount_g,

@@ -97,7 +97,7 @@ class HomeController extends Controller
                     "title" => $slider->title,
                     "subtitle" => $slider->subtitle,
                     "label" => $slider->label,
-                    // "imagen" => $slider->imagen ? env("APP_URL") . "storage/" . $slider->imagen : null,
+                    "imagen" => $slider->imagen ? env("APP_URL") . "storage/" . $slider->imagen : null,
                     "link" => $slider->link,
                     "state" => $slider->state,
                     "color" => $slider->color,
@@ -119,7 +119,7 @@ class HomeController extends Controller
                     "id" => $categorie->id,
                     "name" => $categorie->name,
                     "product_categorie_firsts_count" => $categorie->product_categorie_firsts_count,
-                    // "imagen" => $categorie->imagen ? env("APP_URL") . "storage/" . $categorie->imagen : null,
+                    "imagen" => $categorie->imagen ? env("APP_URL") . "storage/" . $categorie->imagen : null,
                 ];
             }),
             "product_trending_new" => ProductEcommerceCollection::make($productTrendingNew),
@@ -240,12 +240,12 @@ class HomeController extends Controller
                         return [
                             "id" => $categorie->id,
                             "name" => $categorie->name,
-                            // "imagen" => $categorie->imagen ? env("APP_URL") . "storage/" . $categorie->imagen : null,
+                            "imagen" => $categorie->imagen ? env("APP_URL") . "storage/" . $categorie->imagen : null,
                             "subcategories" => $categorie->categorie_seconds->map(function ($subcategorie) {
                                 return [
                                     "id" => $subcategorie->id,
                                     "name" => $subcategorie->name,
-                                    // "imagen" => $subcategorie->imagen ? env("APP_URL") . "storage/" . $subcategorie->imagen : null,
+                                    "imagen" => $subcategorie->imagen ? env("APP_URL") . "storage/" . $subcategorie->imagen : null,
                                 ];
                             }),
                         ];
