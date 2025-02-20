@@ -103,6 +103,11 @@ class CartController extends Controller
 
     public function apply_cupon(Request $request)
     {
+        // Verifica si la vista de mantenimiento está activada
+        if (HomeView::where("name", "vista_mantenimiento")->where("state", 1)->exists()) {
+            return response()->json(["message" => "El sitio está en mantenimiento"], 503);
+        }
+
         $cupon = Cupone::where("code", $request->code_cupon)->where("state", 1)->first();
 
         if (!$cupon) {
@@ -219,6 +224,11 @@ class CartController extends Controller
      */
     public function update(Request $request, string $id)
     {
+        // Verifica si la vista de mantenimiento está activada
+        if (HomeView::where("name", "vista_mantenimiento")->where("state", 1)->exists()) {
+            return response()->json(["message" => "El sitio está en mantenimiento"], 503);
+        }
+
         $user = auth('api')->user();
 
         if ($request->product_variation_id) {
@@ -293,6 +303,11 @@ class CartController extends Controller
 
     public function delete_all()
     {
+        // Verifica si la vista de mantenimiento está activada
+        if (HomeView::where("name", "vista_mantenimiento")->where("state", 1)->exists()) {
+            return response()->json(["message" => "El sitio está en mantenimiento"], 503);
+        }
+
         $user = auth('api')->user();
         $carts = Cart::where("user_id", $user->id)->get();
 
