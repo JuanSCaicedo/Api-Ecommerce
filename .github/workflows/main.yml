@@ -14,13 +14,14 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # 🔑 Clonar el repositorio correctamente
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
-      # 1️⃣ Clonar el repositorio (opcional si ya está en el servidor)
-      - name: Checkout código
-        uses: actions/checkout@v4
-
-      # 2️⃣ Conectar al servidor y actualizar la API
-      - name: Desplegar API Laravel
+      # 📂 Conectar al servidor y actualizar la API
+      - name: Actualizar API Laravel
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.SERVER_HOST }}
@@ -39,17 +40,22 @@ jobs:
             # 👉 Ejecutar git pull usando la clave SSH correcta
             GIT_SSH_COMMAND="ssh -i /github-ssh/github-ssh" git pull origin main
 
-            # Instalar dependencias
+            # 📦 Instalar dependencias
             composer install --no-interaction --prefer-dist --optimize-autoloader
 
-            # Ajustar permisos del directorio storage y cache
-            sudo chown -R www-data: storage bootstrap/cache
+            # ✅ Ajustar permisos del directorio storage y cache
+            sudo chown -R www-data:www-data storage bootstrap/cache
             sudo chmod -R 775 storage bootstrap/cache
 
-            # Limpiar cachés de Laravel
+            # ✅ Ajustar permisos del archivo de logs
+            sudo touch storage/logs/laravel.log
+            sudo chown -R www-data:www-data storage/logs
+            sudo chmod -R 775 storage/logs
+
+            # 🔄 Limpiar cachés de Laravel
             php artisan config:cache
             php artisan route:cache
             php artisan view:cache
 
-            # Reiniciar servidor web (LiteSpeed)
+            # ♻️ Reiniciar servidor web (LiteSpeed)
             sudo systemctl restart lsws
