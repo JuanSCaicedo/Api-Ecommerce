@@ -112,7 +112,6 @@ class CartController extends Controller
             ]);
         }
 
-        // Verificar si el cupón tiene límite de usos y si aún tiene usos disponibles
         if ($cupon->type_count == 2 && $cupon->num_use <= 0) {
             return response()->json([
                 "message" => 403,
@@ -125,72 +124,63 @@ class CartController extends Controller
         $cupon_applied = false;
 
         foreach ($carts as $cart) {
-            //Nivel de producto
-            if ($cupon->type_cupone == 1) {
-                $is_exist_product_cupon = false;
+            if ($cart->code_cupon == $cupon->code) {
+                return response()->json([
+                    "message" => 403,
+                    "message_text" => "El cupón ya fue aplicado."
+                ]);
+            }
 
+            if ($cupon->type_cupone == 1) {
                 foreach ($cupon->products as $cupon_product) {
                     if ($cupon_product->product_id == $cart->product_id) {
-                        $is_exist_product_cupon = true;
+                        $this->updateCartWithDiscount($cart, $cupon);
+                        $cupon_applied = true;
                         break;
                     }
                 }
-
-                if ($is_exist_product_cupon) {
-                    $this->updateCartWithDiscount($cart, $cupon);
-                    $cupon_applied = true;
-                }
             }
 
-            //Nivel de categoria          
             if ($cupon->type_cupone == 2) {
-                $is_exist_category_cupon = false;
-
                 foreach ($cupon->categories as $cupon_product) {
                     if ($cupon_product->categorie_id == $cart->product->categorie_first_id) {
-                        $is_exist_category_cupon = true;
+                        $this->updateCartWithDiscount($cart, $cupon);
+                        $cupon_applied = true;
                         break;
                     }
-                }
-
-                if ($is_exist_category_cupon) {
-                    $this->updateCartWithDiscount($cart, $cupon);
-                    $cupon_applied = true;
                 }
             }
 
-            //Nivel de marca           
             if ($cupon->type_cupone == 3) {
-                $is_exist_brand_cupon = false;
-
                 foreach ($cupon->brands as $cupon_product) {
                     if ($cupon_product->brand_id == $cart->product->brand_id) {
-                        $is_exist_brand_cupon = true;
+                        $this->updateCartWithDiscount($cart, $cupon);
+                        $cupon_applied = true;
                         break;
                     }
-                }
-
-                if ($is_exist_brand_cupon) {
-                    $this->updateCartWithDiscount($cart, $cupon);
-                    $cupon_applied = true;
                 }
             }
         }
 
-        // Si el cupón se aplicó y tiene type_count = 2, decrementar num_use
         if ($cupon_applied && $cupon->type_count == 2) {
             $cupon->update([
                 'num_use' => $cupon->num_use - 1
             ]);
         }
 
+        if (!$cupon_applied) {
+            return response()->json([
+                "message" => 403,
+                "message_text" => "El cupón no aplica a ningún producto en el carrito."
+            ]);
+        }
+
         return response()->json([
             "message" => 200,
-            "message_text" => "Se aplicó el cupón correctamente!."
+            "message_text" => "Se aplicó el cupón correctamente!"
         ]);
     }
 
-    // Método auxiliar para actualizar el carrito con el descuento
     private function updateCartWithDiscount($cart, $cupon)
     {
         $subtotal = 0;
