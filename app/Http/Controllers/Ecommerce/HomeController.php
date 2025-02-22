@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Cache;
 
 class HomeController extends Controller
 {
-    private const CACHE_DURATION = 3600; // 1 hour
+    private const CACHE_DURATION = 2592000; // 1 mes
     private const CACHE_DURATION_DAILY = 86400; // 24 hours
 
     public function home(Request $request)
@@ -189,14 +189,18 @@ class HomeController extends Controller
             'last_discounts' => $this->getCachedRandomProducts('last_discounts', 3),
             'last_featured' => $this->getCachedRandomProducts('last_featured', 3),
             'last_selling' => $this->getCachedRandomProducts('last_selling', 3),
-            'electronics' => $this->getCachedData('electronics', fn() => 
+            'electronics' => $this->getCachedData(
+                'electronics',
+                fn() =>
                 Product::where("state", 2)
                     ->where("categorie_first_id", 1)
                     ->inRandomOrder()
                     ->limit(6)
                     ->get()
             ),
-            'carusel' => $this->getCachedData('carusel', fn() => 
+            'carusel' => $this->getCachedData(
+                'carusel',
+                fn() =>
                 Product::where("state", 2)
                     ->whereIn("categorie_first_id", $categoriesRandom->pluck("id"))
                     ->inRandomOrder()
@@ -207,7 +211,9 @@ class HomeController extends Controller
 
     private function getCachedRandomProducts($key, $limit)
     {
-        return $this->getCachedData("products_{$key}", fn() => 
+        return $this->getCachedData(
+            "products_{$key}",
+            fn() =>
             Product::where("state", 2)
                 ->inRandomOrder()
                 ->limit($limit)
@@ -232,19 +238,21 @@ class HomeController extends Controller
                 $query->whereHas('products', function ($q) use ($product) {
                     $q->where('product_id', $product->id);
                 })
-                ->orWhereHas('categories', function ($q) use ($product) {
-                    $q->where('categorie_id', $product->categorie_first_id);
-                })
-                ->orWhereHas('brands', function ($q) use ($product) {
-                    $q->where('brand_id', $product->brand_id);
-                });
+                    ->orWhereHas('categories', function ($q) use ($product) {
+                        $q->where('categorie_id', $product->categorie_first_id);
+                    })
+                    ->orWhereHas('brands', function ($q) use ($product) {
+                        $q->where('brand_id', $product->brand_id);
+                    });
             })
             ->first();
     }
 
     private function getRelatedProducts($product)
     {
-        return $this->getCachedData("related_products_{$product->id}", fn() =>
+        return $this->getCachedData(
+            "related_products_{$product->id}",
+            fn() =>
             Product::where("categorie_first_id", $product->categorie_first_id)
                 ->where("id", "!=", $product->id)
                 ->where("state", 2)
@@ -255,20 +263,23 @@ class HomeController extends Controller
 
     private function getCachedMenuCategories()
     {
-        return $this->getCachedData('menu_categories', fn() =>
+        return $this->getCachedData(
+            'menu_categories',
+            fn() =>
             Categorie::with(['categorie_seconds.categorie_seconds'])
                 ->whereNull(["categorie_second_id", "categorie_third_id"])
                 ->where("state", 1)
                 ->orderBy("position", "desc")
-                ->get()
-        , self::CACHE_DURATION_DAILY);
+                ->get(),
+            self::CACHE_DURATION_DAILY
+        );
     }
 
     // Formatting methods
     private function formatDiscountFlash($discountFlash)
     {
         if (!$discountFlash) return null;
-        
+
         $discountFlash->end_date_format = Carbon::parse($discountFlash->end_date)->format("M d Y H:i:s");
         return $discountFlash;
     }
