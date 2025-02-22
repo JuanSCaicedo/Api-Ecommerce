@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Ecommerce;
 
 use App\Http\Controllers\Controller;
+use App\Models\HomeView;
 use App\Models\Sale\UserAddres;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -14,6 +15,11 @@ class UserAdressController extends Controller
      */
     public function index()
     {
+        // Verifica si la vista de mantenimiento está activada
+        if (HomeView::where("name", "vista_mantenimiento")->where("state", 1)->exists()) {
+            return response()->json(["message" => "El sitio está en mantenimiento"], 503);
+        }
+
         $user = auth('api')->user();
 
         $address = UserAddres::where("user_id", $user->id)->orderBy("id", "desc")->get();
@@ -29,6 +35,11 @@ class UserAdressController extends Controller
      */
     public function store(Request $request)
     {
+        // Verifica si la vista de mantenimiento está activada
+        if (HomeView::where("name", "vista_mantenimiento")->where("state", 1)->exists()) {
+            return response()->json(["message" => "El sitio está en mantenimiento"], 503);
+        }
+
         $request->request->add(["user_id" => auth('api')->user()->id]);
 
         $addres = UserAddres::create($request->all());
@@ -52,6 +63,11 @@ class UserAdressController extends Controller
      */
     public function update(Request $request, string $id)
     {
+        // Verifica si la vista de mantenimiento está activada
+        if (HomeView::where("name", "vista_mantenimiento")->where("state", 1)->exists()) {
+            return response()->json(["message" => "El sitio está en mantenimiento"], 503);
+        }
+
         $addres = UserAddres::findOrFail($id);
         $addres->update($request->all());
 
@@ -66,6 +82,11 @@ class UserAdressController extends Controller
      */
     public function destroy(string $id)
     {
+        // Verifica si la vista de mantenimiento está activada
+        if (HomeView::where("name", "vista_mantenimiento")->where("state", 1)->exists()) {
+            return response()->json(["message" => "El sitio está en mantenimiento"], 503);
+        }
+        
         $addres = UserAddres::findOrFail($id);
         $addres->delete();
 
