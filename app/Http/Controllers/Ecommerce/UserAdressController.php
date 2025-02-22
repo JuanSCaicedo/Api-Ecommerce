@@ -29,11 +29,13 @@ class UserAdressController extends Controller
      */
     public function store(Request $request)
     {
-        $addres = UserAddres::created($request->all());
+        $request->request->add(["user_id" => auth('api')->user()->id]);
+
+        $addres = UserAddres::create($request->all());
 
         return response()->json([
             "message" => 201,
-            "address" => $addres
+            "addres" => $addres
         ]);
     }
 
@@ -55,7 +57,7 @@ class UserAdressController extends Controller
 
         return response()->json([
             "message" => 200,
-            "address" => $addres
+            "addres" => $addres
         ]);
     }
 
