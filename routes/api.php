@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Ecommerce\CartController;
 use App\Http\Controllers\Ecommerce\HomeController;
+use App\Http\Controllers\Ecommerce\UserAdressController;
 
 Route::group([
 
@@ -88,6 +89,7 @@ Route::group([
             Route::delete("cart/delete_all", [CartController::class, "delete_all"]);
             Route::post("cart/apply_cupon", [CartController::class, "apply_cupon"]);
             Route::resource("cart", CartController::class);
+            Route::resource("user_address", UserAdressController::class);
         }
     );
 });
