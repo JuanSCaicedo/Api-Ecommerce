@@ -56,7 +56,11 @@ class SaleController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $sale = Sale::where("n_transaccion", $id)->first();
+
+        return response()->json([
+            "sale" => $sale,
+        ]);
     }
 
     /**
