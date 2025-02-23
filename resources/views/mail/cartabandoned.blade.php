@@ -558,7 +558,8 @@
                                                                                                                                     width="230"
                                                                                                                                     height="180"
                                                                                                                                     editable="true"
-                                                                                                                                    alt="" /></a>
+                                                                                                                                    alt=""
+                                                                                                                                    style="width: 304px; height: 261px; object-fit: contain;" /></a>
                                                                                                                         </div>
                                                                                                                     </th>
                                                                                                                     <th class="column-top mpb-15"
