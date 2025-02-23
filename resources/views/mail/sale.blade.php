@@ -289,7 +289,7 @@
                                                                                                 cellpadding="0">
                                                                                                 <tr>
                                                                                                     <td class="fluid-img img-center pb-50"
-                                                                                                        style="font-size:0pt; line-height:0pt; text-align:center; padding-bottom: 50px;">
+                                                                                                        style="font-size:0pt; line-height:0pt; text-align:center; padding: 50px;">
                                                                                                         <img src="https://cdn-icons-png.flaticon.com/512/994/994825.png"
                                                                                                             width="331"
                                                                                                             height="268"
