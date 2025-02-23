@@ -295,7 +295,8 @@
                                                                                                             height="268"
                                                                                                             editable="true"
                                                                                                             border="0"
-                                                                                                            alt="" />
+                                                                                                            alt=""
+                                                                                                            style="width: 304px; height: 261px; object-fit: contain;" />
                                                                                                     </td>
                                                                                                 </tr>
                                                                                                 <tr>

@@ -295,7 +295,8 @@
                                                                                                             height="268"
                                                                                                             editable="true"
                                                                                                             border="0"
-                                                                                                            alt="" />
+                                                                                                            alt=""
+                                                                                                            style="width: 304px; height: 261px; object-fit: contain;"s />
                                                                                                     </td>
                                                                                                 </tr>
                                                                                                 <tr>
@@ -701,7 +702,8 @@
                                                                                                                                         <td class="title-20 lh-30 mt-right"
                                                                                                                                             style="font-size:20px; color:#282828; font-family:'PT Sans', Arial, sans-serif; text-align:left; min-width:auto !important; line-height: 30px;">
                                                                                                                                             <multiline>
-                                                                                                                                                ${{ $sale->total }} {{ $sale->currency_payment }}
+                                                                                                                                                ${{ $sale->total }}
+                                                                                                                                                {{ $sale->currency_payment }}
                                                                                                                                             </multiline>
                                                                                                                                         </td>
                                                                                                                                     </tr>
@@ -752,7 +754,9 @@
                                                                                                                                         <td class="title-20 lh-30 c-purple pt-10 mt-right"
                                                                                                                                             style="font-size:20px; font-family:'PT Sans', Arial, sans-serif; text-align:left; min-width:auto !important; line-height: 30px; color:#9128df; padding-top: 10px;">
                                                                                                                                             <multiline>
-                                                                                                                                                <strong>${{ $sale->total }} {{ $sale->currency_payment }} </strong>
+                                                                                                                                                <strong>${{ $sale->total }}
+                                                                                                                                                    {{ $sale->currency_payment }}
+                                                                                                                                                </strong>
                                                                                                                                             </multiline>
                                                                                                                                         </td>
                                                                                                                                     </tr>
