@@ -3,11 +3,13 @@
 namespace App\Http\Controllers\Ecommerce;
 
 use App\Http\Controllers\Controller;
+use App\Mail\SaleMail;
 use App\Models\Sale\Cart;
 use App\Models\Sale\Sale;
 use App\Models\Sale\SaleAddres;
 use App\Models\Sale\SaleDetail;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 
 class SaleController extends Controller
 {
@@ -39,6 +41,10 @@ class SaleController extends Controller
         $sale_addres = $request->sale_address;
         $sale_addres['sale_id'] = $sale->id;
         $sale_address = SaleAddres::create($sale_addres);
+
+        //Enviar correo de la compra
+        $sale_new = Sale::findOrfail($sale->id);
+        Mail::to(auth("api")->user()->email)->send(new SaleMail(auth("api")->user(), $sale_new));
 
         return response()->json([
             "message" => 200,

@@ -40,7 +40,7 @@ class Sale extends Model
         return $this->hasMany(SaleDetail::class);
     }
 
-    public function sale_address()
+    public function sale_addres()
     {
         return $this->hasOne(SaleAddres::class);
     }
