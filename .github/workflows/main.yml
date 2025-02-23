@@ -68,3 +68,5 @@ jobs:
 
             # Actualizar dependencias
             composer update
+            php artisan config:clear
+            php artisan cache:clear
