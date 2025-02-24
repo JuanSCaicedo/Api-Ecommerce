@@ -97,30 +97,23 @@ class SaleController extends Controller
     {
         MercadoPagoConfig::setAccessToken(env("MERCADOPAGO_KEY"));
         $client = new PreferenceClient();
-        // $client->auto_return = "approved";
+        $client->auto_return = "approved";
 
-        // $carts = Cart::where('user_id', auth("api")->user()->id)->get();
+        $carts = Cart::where('user_id', auth("api")->user()->id)->get();
 
-        // $array_carts = [];
+        $array_carts = [];
 
-        // foreach ($carts as $cart) {
-        //     array_push($array_carts, [
-        //         "title" => $cart->product->title,
-        //         "quantity" => $cart->quantity,
-        //         "currency_id" => $cart->currency,
-        //         "unit_price" => $cart->total
-        //     ]);
-        // }
+        foreach ($carts as $cart) {
+            array_push($array_carts, [
+                "title" => $cart->product->title,
+                "quantity" => $cart->quantity,
+                "currency_id" => $cart->currency,
+                "unit_price" => $cart->total
+            ]);
+        }
 
         $datos = array(
-            "items" => [
-                [
-                    "title" => "Meu produto",
-                    "quantity" => 1,
-                    "currency_id" => "COP",
-                    "unit_price" => 100,
-                ]
-            ],
+            "items" => $array_carts,
             "back_urls" => array(
                 "success" => env("URL_TIENDA") . "mercado-pago-success",
                 "failure" => env("URL_TIENDA") . "mercado-pago-failure",
