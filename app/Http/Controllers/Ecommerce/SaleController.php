@@ -95,6 +95,11 @@ class SaleController extends Controller
 
     public function mercadopago(Request $request)
     {
+        // Verifica si la vista de mantenimiento está activada
+        if (HomeView::where("name", "vista_mantenimiento")->where("state", 1)->exists()) {
+            return response()->json(["message" => "El sitio está en mantenimiento"], 503);
+        }
+        
         MercadoPagoConfig::setAccessToken(env("MERCADOPAGO_KEY"));
         $client = new PreferenceClient();
         $client->auto_return = "approved";
