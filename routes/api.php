@@ -93,6 +93,7 @@ Route::group([
             Route::resource("user_address", UserAdressController::class);
             Route::post("checkout", [SaleController::class, "store"]);
             Route::get("sale/{id}", [SaleController::class, "show"]);
+            Route::get("mercadopago", [SaleController::class, "mercadopago"]);
         }
     );
 });
