@@ -97,7 +97,7 @@ class SaleController extends Controller
     {
         MercadoPagoConfig::setAccessToken(env("MERCADOPAGO_KEY"));
         $client = new PreferenceClient();
-        $client->auto_return = "approved";
+        // $client->auto_return = "approved";
 
         // $carts = Cart::where('user_id', auth("api")->user()->id)->get();
 
@@ -118,7 +118,7 @@ class SaleController extends Controller
                     "title" => "Meu produto",
                     "quantity" => 1,
                     "currency_id" => "COP",
-                    "unit_price" => 100
+                    "unit_price" => 100,
                 ]
             ],
             "back_urls" => array(
