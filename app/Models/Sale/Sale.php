@@ -2,6 +2,7 @@
 
 namespace App\Models\Sale;
 
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -43,5 +44,9 @@ class Sale extends Model
     public function sale_addres()
     {
         return $this->hasOne(SaleAddres::class);
+    }
+
+    public function user(){
+        return $this->belongsTo(User::class);
     }
 }

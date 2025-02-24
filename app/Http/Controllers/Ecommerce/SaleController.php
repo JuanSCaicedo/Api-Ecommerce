@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Ecommerce;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\Ecommerce\Sale\SaleResource;
 use App\Mail\SaleMail;
+use App\Models\HomeView;
 use App\Models\Sale\Cart;
 use App\Models\Sale\Sale;
 use App\Models\Sale\SaleAddres;
@@ -26,6 +28,11 @@ class SaleController extends Controller
      */
     public function store(Request $request)
     {
+        // Verifica si la vista de mantenimiento está activada
+        if (HomeView::where("name", "vista_mantenimiento")->where("state", 1)->exists()) {
+            return response()->json(["message" => "El sitio está en mantenimiento"], 503);
+        }
+
         $request->request->add(['user_id' => auth("api")->user()->id]);
         $sale = Sale::create($request->all());
 
@@ -56,10 +63,15 @@ class SaleController extends Controller
      */
     public function show(string $id)
     {
+        // Verifica si la vista de mantenimiento está activada
+        if (HomeView::where("name", "vista_mantenimiento")->where("state", 1)->exists()) {
+            return response()->json(["message" => "El sitio está en mantenimiento"], 503);
+        }
+
         $sale = Sale::where("n_transaccion", $id)->first();
 
         return response()->json([
-            "sale" => $sale,
+            "sale" => SaleResource::make($sale),
         ]);
     }
 

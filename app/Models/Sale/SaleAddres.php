@@ -36,4 +36,9 @@ class SaleAddres extends Model
         date_default_timezone_set("America/Bogota");
         $this->attributes["updated_at"] = Carbon::now();
     }
+
+    public function sale()
+{
+    return $this->belongsTo(Sale::class);
+}
 }
