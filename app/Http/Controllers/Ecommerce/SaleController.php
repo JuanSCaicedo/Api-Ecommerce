@@ -132,16 +132,7 @@ class SaleController extends Controller
             "auto_return" => "approved",
             "external_reference" => uniqid(),
         );
-        
-        try {
-            $preference = $client->create($datos);
-            return response()->json(["preference" => $preference]);
-        } catch (\Exception $e) {
-            return response()->json([
-                "error" => true,
-                "message" => $e->getMessage(),
-            ], 500);
-        }        
+        $preference = $client->create($datos);
 
         return response()->json([
             "preference" => $preference,

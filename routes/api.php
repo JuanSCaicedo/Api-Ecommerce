@@ -95,7 +95,7 @@ Route::group([
             Route::post("checkout-temp", [SaleController::class, "checkout_temp"]);
             Route::get("sale/{id}", [SaleController::class, "show"]);
             Route::get("mercadopago", [SaleController::class, "mercadopago"]);
+            Route::post("checkout-mercadopago", [SaleController::class, "checkout_mercadopago"]);
         }
     );
-    Route::post("checkout-mercadopago", [SaleController::class, "checkout_mercadopago"]);
 });
