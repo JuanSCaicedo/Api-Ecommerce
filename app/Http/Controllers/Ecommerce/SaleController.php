@@ -104,21 +104,19 @@ class SaleController extends Controller
 
         MercadoPagoConfig::setAccessToken(env("MERCADOPAGO_KEY"));
         $client = new PreferenceClient();
-        // $client->auto_return = "approved";
 
-        $carts = Cart::where('user_id', auth("api")->user()->id)->get();
+        $carts = Cart::where("user_id", auth("api")->user()->id)->get();
 
         $array_carts = [];
 
-        foreach ($carts as $cart) {
+        foreach ($carts as $key => $cart) {
             array_push($array_carts, [
                 "title" => $cart->product->title,
                 "quantity" => $cart->quantity,
                 "currency_id" => $cart->currency,
-                "unit_price" => $cart->total
+                "unit_price" => $cart->total,
             ]);
         }
-
         $datos = array(
             "items" => $array_carts,
             "back_urls" => array(
@@ -134,7 +132,16 @@ class SaleController extends Controller
             "auto_return" => "approved",
             "external_reference" => uniqid(),
         );
-        $preference = $client->create($datos);
+        
+        try {
+            $preference = $client->create($datos);
+            return response()->json(["preference" => $preference]);
+        } catch (\Exception $e) {
+            return response()->json([
+                "error" => true,
+                "message" => $e->getMessage(),
+            ], 500);
+        }        
 
         return response()->json([
             "preference" => $preference,
