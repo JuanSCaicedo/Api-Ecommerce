@@ -23,6 +23,7 @@ class Sale extends Model
         "price_dolar",
         "n_transaccion",
         "description",
+        "preference_id",
     ];
 
     public function setCreatedAtAttribute($value)
