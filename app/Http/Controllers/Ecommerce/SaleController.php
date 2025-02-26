@@ -12,6 +12,7 @@ use App\Models\Sale\SaleAddres;
 use App\Models\Sale\SaleDetail;
 use App\Models\Sale\SaleTemp;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
 use MercadoPago\Client\Preference\PreferenceClient;
 use MercadoPago\MercadoPagoConfig;
@@ -161,6 +162,52 @@ class SaleController extends Controller
                 "sale_address" => json_encode($request->sale_address),
             ]);
         }
+
+        return response()->json([
+            "message" => 200,
+        ]);
+    }
+
+    public function checkout_mercadopago(Request $request)
+    {
+        // Verifica si la vista de mantenimiento está activada
+        if (HomeView::where("name", "vista_mantenimiento")->where("state", 1)->exists()) {
+            return response()->json(["message" => "El sitio está en mantenimiento"], 503);
+        }
+
+        $response = Http::withHeaders([
+            "Content-Type" => "application/json",
+            "Authorization" => "Bearer " . env("MERCADOPAGO_KEY")
+        ])->withoutVerifying()->get("https://api.mercadopago.com/v1/payments/" . $request->n_transaccion);
+
+        $format_response = json_decode($response->getBody()->getContents(), true);
+        $sale_temp = SaleTemp::where("user_id", auth("api")->user()->id)->first();
+
+        $request->request->add([
+            'user_id' => auth("api")->user()->id,
+            'total' => $format_response['transaction_amount'],
+            'subtotal' => $format_response['transaction_amount'],
+            'description' => $sale_temp->description ? $sale_temp->description : NULL,
+        ]);
+
+        $sale = Sale::create($request->all());
+
+        $carts = Cart::where('user_id', auth("api")->user()->id)->get();
+
+        foreach ($carts as $cart) {
+            $new_detail = [];
+            $new_detail = $cart->toArray();
+            $new_detail['sale_id'] = $sale->id;
+            SaleDetail::create($new_detail);
+        }
+
+        $sale_addres = json_decode($sale_temp->sale_address, true);
+        $sale_addres['sale_id'] = $sale->id;
+        $sale_address = SaleAddres::create($sale_addres);
+
+        //Enviar correo de la compra
+        $sale_new = Sale::findOrfail($sale->id);
+        Mail::to(auth("api")->user()->email)->send(new SaleMail(auth("api")->user(), $sale_new));
 
         return response()->json([
             "message" => 200,

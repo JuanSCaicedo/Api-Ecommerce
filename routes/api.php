@@ -97,4 +97,5 @@ Route::group([
             Route::get("mercadopago", [SaleController::class, "mercadopago"]);
         }
     );
+    Route::post("checkout-mercadopago", [SaleController::class, "checkout_mercadopago"]);
 });
