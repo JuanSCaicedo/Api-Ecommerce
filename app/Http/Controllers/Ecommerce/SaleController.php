@@ -10,6 +10,7 @@ use App\Models\Sale\Cart;
 use App\Models\Sale\Sale;
 use App\Models\Sale\SaleAddres;
 use App\Models\Sale\SaleDetail;
+use App\Models\Sale\SaleTemp;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use MercadoPago\Client\Preference\PreferenceClient;
@@ -136,6 +137,33 @@ class SaleController extends Controller
 
         return response()->json([
             "preference" => $preference,
+        ]);
+    }
+
+    public function checkout_temp(Request $request)
+    {
+        // Verifica si la vista de mantenimiento está activada
+        if (HomeView::where("name", "vista_mantenimiento")->where("state", 1)->exists()) {
+            return response()->json(["message" => "El sitio está en mantenimiento"], 503);
+        }
+
+        $sale_temp = SaleTemp::where("user_id", auth("api")->user()->id)->first();
+
+        if ($sale_temp) {
+            $sale_temp->update([
+                "description" => $request->description,
+                "sale_address" => json_encode($request->sale_address),
+            ]);
+        } else {
+            SaleTemp::create([
+                "user_id" => auth("api")->user()->id,
+                "description" => $request->description,
+                "sale_address" => json_encode($request->sale_address),
+            ]);
+        }
+
+        return response()->json([
+            "message" => 200,
         ]);
     }
 }

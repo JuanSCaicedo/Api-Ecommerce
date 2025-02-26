@@ -92,6 +92,7 @@ Route::group([
             Route::resource("cart", CartController::class);
             Route::resource("user_address", UserAdressController::class);
             Route::post("checkout", [SaleController::class, "store"]);
+            Route::post("checkout-temp", [SaleController::class, "checkout_temp"]);
             Route::get("sale/{id}", [SaleController::class, "show"]);
             Route::get("mercadopago", [SaleController::class, "mercadopago"]);
         }
