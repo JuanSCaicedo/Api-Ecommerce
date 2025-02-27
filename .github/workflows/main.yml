@@ -38,6 +38,9 @@ jobs:
             # Ajustar permisos en el repositorio si es necesario
             sudo chown -R $USER:$USER .git
 
+            # Reiniciar cambios en local
+            sudo git reset --hard
+
             # 👉 Ejecutar git pull usando la clave SSH correcta
             sudo GIT_SSH_COMMAND="ssh -i /github-ssh/github-ssh" git pull origin main
 
