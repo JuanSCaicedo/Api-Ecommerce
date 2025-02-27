@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\Ecommerce\Sale\SaleResource;
 use App\Mail\SaleMail;
 use App\Models\HomeView;
+use App\Models\Product\Product;
+use App\Models\Product\ProductVariation;
 use App\Models\Sale\Cart;
 use App\Models\Sale\Sale;
 use App\Models\Sale\SaleAddres;
@@ -43,10 +45,38 @@ class SaleController extends Controller
         $carts = Cart::where('user_id', auth("api")->user()->id)->get();
 
         foreach ($carts as $cart) {
+            $nCart = $cart;
             $new_detail = [];
-            $new_detail = $cart->toArray();
+            $new_detail = $nCart->toArray();
             $new_detail['sale_id'] = $sale->id;
             SaleDetail::create($new_detail);
+
+            //Descuento stock del producto
+            if ($cart->product_variation_id) {
+                $variation = ProductVariation::find($cart->product_variation_id);
+
+                if ($variation->variation_father) {
+                    $variation->variation_father->update([
+                        "stock" => $variation->variation_father->stock - $cart->quantity,
+                    ]);
+
+                    $variation->update([
+                        "stock" => $variation->stock - $cart->quantity,
+                    ]);
+                } else {
+                    $variation->update([
+                        "stock" => $variation->stock - $cart->quantity,
+                    ]);
+                }
+            } else {
+                $product = Product::find($cart->product_id);
+                $product->update([
+                    "stock" => $product->stock - $cart->quantity,
+                ]);
+            }
+
+            //Eliminación del carrito
+            $cart->delete();
         }
 
         $sale_addres = $request->sale_address;
@@ -198,10 +228,38 @@ class SaleController extends Controller
         $carts = Cart::where('user_id', auth("api")->user()->id)->get();
 
         foreach ($carts as $cart) {
+            $nCart = $cart;
             $new_detail = [];
-            $new_detail = $cart->toArray();
+            $new_detail = $nCart->toArray();
             $new_detail['sale_id'] = $sale->id;
             SaleDetail::create($new_detail);
+
+            //Descuento stock del producto
+            if ($cart->product_variation_id) {
+                $variation = ProductVariation::find($cart->product_variation_id);
+
+                if ($variation->variation_father) {
+                    $variation->variation_father->update([
+                        "stock" => $variation->variation_father->stock - $cart->quantity,
+                    ]);
+
+                    $variation->update([
+                        "stock" => $variation->stock - $cart->quantity,
+                    ]);
+                } else {
+                    $variation->update([
+                        "stock" => $variation->stock - $cart->quantity,
+                    ]);
+                }
+            } else {
+                $product = Product::find($cart->product_id);
+                $product->update([
+                    "stock" => $product->stock - $cart->quantity,
+                ]);
+            }
+
+            //Eliminación del carrito
+            $cart->delete();
         }
 
         $sale_addres = json_decode($sale_temp->sale_address, true);
