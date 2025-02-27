@@ -109,7 +109,7 @@ class SaleController extends Controller
 
         // Verifica si el carrito está vacío
         if ($carts->isEmpty()) {
-            return response()->json(["message" => "El carrito está vacío"], 400);
+            return response()->json(["message" => "El carrito está vacío"], 200);
         }
 
         $array_carts = [];
