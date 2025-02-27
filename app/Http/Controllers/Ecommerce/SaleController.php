@@ -149,7 +149,7 @@ class SaleController extends Controller
                 "title" => $cart->product->title,
                 "quantity" => $cart->quantity,
                 "currency_id" => $cart->currency,
-                "unit_price" => $cart->total,
+                "unit_price" => round($cart->total) // Precio total del producto redondeado
             ]);
         }
         $datos = array(
