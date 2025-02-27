@@ -107,6 +107,11 @@ class SaleController extends Controller
 
         $carts = Cart::where("user_id", auth("api")->user()->id)->get();
 
+        // Verifica si el carrito está vacío
+        if ($carts->isEmpty()) {
+            return response()->json(["message" => "El carrito está vacío"], 400);
+        }
+
         $array_carts = [];
 
         foreach ($carts as $key => $cart) {
