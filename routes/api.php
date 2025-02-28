@@ -99,6 +99,7 @@ Route::group([
 
             Route::get("profile_client/me", [AuthController::class, "me"]);
             Route::put("profile_client", [AuthController::class, "update"]);
+            Route::get("profile_client/orders", [SaleController::class, "orders"]);
         }
     );
 });

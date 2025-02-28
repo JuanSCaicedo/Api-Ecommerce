@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Ecommerce;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\Ecommerce\Sale\SaleCollection;
 use App\Http\Resources\Ecommerce\Sale\SaleResource;
 use App\Mail\SaleMail;
 use App\Models\HomeView;
@@ -272,6 +273,17 @@ class SaleController extends Controller
 
         return response()->json([
             "message" => 200,
+        ]);
+    }
+
+    public function orders(Request $request)
+    {
+        $user = auth("api")->user();
+
+        $sales = Sale::where("user_id", $user->id)->orderBy("id", "desc")->paginate(10);
+
+        return response()->json([
+            "sales" => SaleCollection::make($sales),
         ]);
     }
 }
