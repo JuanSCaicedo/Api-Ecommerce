@@ -96,7 +96,7 @@ class AuthController extends Controller
             return response()->json(['message' => 403]);
         }
     }
-    
+
     public function verified_code(Request $request)
     {
         // Verifica si la vista de mantenimiento está activada
@@ -236,7 +236,18 @@ class AuthController extends Controller
      */
     public function me()
     {
-        return response()->json(auth('api')->user());
+        $user = User::find(auth("api")->user()->id);
+        return response()->json([
+            'name' => $user->name,
+            'surname' => $user->surname,
+            'phone' => $user->phone,
+            'email' => $user->email,
+            'bio' => $user->bio,
+            'fb' => $user->fb,
+            'sexo' => $user->sexo,
+            'address_city' => $user->address_city,
+            'avatar' => $user->avatar ? env("APP_URL") . "storage/" . $user->avatar : 'https://cdn-icons-png.flaticon.com/512/1476/1476614.png',
+        ]);
     }
 
     /**

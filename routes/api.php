@@ -96,6 +96,8 @@ Route::group([
             Route::get("sale/{id}", [SaleController::class, "show"]);
             Route::get("mercadopago", [SaleController::class, "mercadopago"]);
             Route::post("checkout-mercadopago", [SaleController::class, "checkout_mercadopago"]);
+
+            Route::get("profile_client/me", [AuthController::class, "me"]);
         }
     );
 });
