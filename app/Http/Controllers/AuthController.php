@@ -236,6 +236,11 @@ class AuthController extends Controller
      */
     public function me()
     {
+        // Verifica si la vista de mantenimiento está activada
+        if (HomeView::where("name", "vista_mantenimiento")->where("state", 1)->exists()) {
+            return response()->json(["message" => "El sitio está en mantenimiento"], 503);
+        }
+
         $user = User::find(auth("api")->user()->id);
         return response()->json([
             'name' => $user->name,
@@ -244,6 +249,7 @@ class AuthController extends Controller
             'email' => $user->email,
             'bio' => $user->bio,
             'fb' => $user->fb,
+            'tw' => $user->tw,
             'sexo' => $user->sexo,
             'address_city' => $user->address_city,
             'avatar' => $user->avatar ? env("APP_URL") . "storage/" . $user->avatar : 'https://cdn-icons-png.flaticon.com/512/1476/1476614.png',
@@ -316,7 +322,6 @@ class AuthController extends Controller
         return response()->json(['message' => 'Token not found'], 404);
     }
 
-
     /**
      * Refresh a token.
      *
@@ -345,5 +350,26 @@ class AuthController extends Controller
                 "email" => auth('api')->user()->email,
             ],
         ]);
+    }
+
+    public function update(Request $request)
+    {
+        // Verifica si la vista de mantenimiento está activada
+        if (HomeView::where("name", "vista_mantenimiento")->where("state", 1)->exists()) {
+            return response()->json(["message" => "El sitio está en mantenimiento"], 503);
+        }
+
+        $is_exist_email = User::where("id", "<>", auth("api")->user()->id)->where("email", $request->email)->first();
+
+        if ($is_exist_email) {
+            return response()->json([
+                "message" => 403,
+                "message_text" => "El usuario ya existe"
+            ]);
+        }
+
+        $user = User::find(auth("api")->user()->id);
+        $user->update($request->all());
+        return response()->json(["message" => 200]);
     }
 }
