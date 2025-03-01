@@ -284,6 +284,7 @@ class SaleController extends Controller
 
         return response()->json([
             "sales" => SaleCollection::make($sales),
+            "total" => $sales->total(),
         ]);
     }
 }
