@@ -70,6 +70,6 @@ jobs:
             cd /home/api-ecommerce.juandevops.com/public_html
 
             # Actualizar dependencias
-            composer update
-            php artisan config:clear
-            php artisan cache:clear
+            sudo composer update --no-interaction
+            sudo php artisan config:clear
+            sudo php artisan cache:clear
