@@ -3,6 +3,7 @@
 namespace App\Models\Product;
 
 use App\Models\Discount\DiscountProduct;
+use App\Models\Sale\Review;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -82,6 +83,21 @@ class Product extends Model
         return $this->hasMany(ProductSpecification::class, "product_id");
     }
 
+    public function reviews()
+    {
+        return $this->hasMany(Review::class, "product_id");
+    }
+
+    public function getReViewsCountAttribute()
+    {
+        return $this->reviews->count();
+    }
+
+    public function getReviewsAvgAttribute()
+    {
+        return $this->reviews->avg("rating");
+    }
+
     public function getDiscountCategorieAttribute()
     {
         date_default_timezone_set('America/Bogota');
@@ -111,17 +127,20 @@ class Product extends Model
         $discount = null;
 
         foreach ($this->discount_products as $key => $discount_product) {
-            if($discount_product->discount && $discount_product->discount->type_campaing == 1 &&
-            $discount_product->discount->state == 1){
+            if (
+                $discount_product->discount && $discount_product->discount->type_campaing == 1 &&
+                $discount_product->discount->state == 1
+            ) {
                 // [24-01-2024, 25  ,27-01-2024]
-                if(Carbon::now()->between($discount_product->discount->start_date,Carbon::parse(
-                    $discount_product->discount->end_date)->addDays(1))){
+                if (Carbon::now()->between($discount_product->discount->start_date, Carbon::parse(
+                    $discount_product->discount->end_date
+                )->addDays(1))) {
                     $discount = $discount_product->discount;
                     break;
                 }
             }
         }
-        
+
         return $discount;
     }
 
@@ -131,11 +150,14 @@ class Product extends Model
         $discount = null;
 
         foreach ($this->brand->discount_brands as $key => $discount_brand) {
-            if($discount_brand->discount && $discount_brand->discount->type_campaing == 1 &&
-            $discount_brand->discount->state == 1){
+            if (
+                $discount_brand->discount && $discount_brand->discount->type_campaing == 1 &&
+                $discount_brand->discount->state == 1
+            ) {
                 // [24-01-2024, 25  ,27-01-2024]
-                if(Carbon::now()->between($discount_brand->discount->start_date,Carbon::parse(
-                    $discount_brand->discount->end_date)->addDays(1))){
+                if (Carbon::now()->between($discount_brand->discount->start_date, Carbon::parse(
+                    $discount_brand->discount->end_date
+                )->addDays(1))) {
                     $discount = $discount_brand->discount;
                     break;
                 }
