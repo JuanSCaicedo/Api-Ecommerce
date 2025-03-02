@@ -14,6 +14,8 @@ use App\Models\UserToken;
 use Illuminate\Support\Facades\Mail;
 use Validator;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
@@ -359,17 +361,48 @@ class AuthController extends Controller
             return response()->json(["message" => "El sitio está en mantenimiento"], 503);
         }
 
-        $is_exist_email = User::where("id", "<>", auth("api")->user()->id)->where("email", $request->email)->first();
+        // Obtiene el usuario autenticado
+        $user = Auth::user();
 
-        if ($is_exist_email) {
+        // Validar si el usuario quiere actualizar la contraseña
+        if ($request->filled('current_password') && $request->filled('password')) {
+
+            // Verifica si la contraseña actual es correcta
+            if (!Hash::check($request->current_password, $user->password)) {
+                return response()->json([
+                    "message" => 403,
+                    "message_text" => "La contraseña actual es incorrecta"
+                ], 403);
+            }
+
+            // Actualizar la nueva contraseña
+            $user->update([
+                "password" => bcrypt($request->password)
+            ]);
+
+            return response()->json([
+                "message" => 200,
+                "message_text" => "Contraseña actualizada correctamente"
+            ]);
+        }
+
+        // Validar si el email ya existe en otro usuario
+        $is_exists_email = User::where("id", "<>", $user->id)
+            ->where("email", $request->email)
+            ->first();
+
+        if ($is_exists_email) {
             return response()->json([
                 "message" => 403,
                 "message_text" => "El usuario ya existe"
             ]);
         }
 
-        $user = User::find(auth("api")->user()->id);
-        $user->update($request->all());
-        return response()->json(["message" => 200]);
+        // Actualizar otros datos del usuario
+        $user->update($request->except(["password", "current_password"]));
+
+        return response()->json([
+            "message" => 200,
+        ]);
     }
 }
