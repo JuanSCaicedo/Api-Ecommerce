@@ -15,7 +15,9 @@ use Illuminate\Support\Facades\Mail;
 use Validator;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 
 class AuthController extends Controller
 {
@@ -254,7 +256,7 @@ class AuthController extends Controller
             'tw' => $user->tw,
             'sexo' => $user->sexo,
             'address_city' => $user->address_city,
-            'avatar' => $user->avatar ? env("APP_URL") . "storage/" . $user->avatar : 'https://cdn-icons-png.flaticon.com/512/1476/1476614.png',
+            'avatar' => $user->avatar ? env("APP_URL") . "storage/" . $user->avatar : 'https://cdn-icons-png.flaticon.com/512/18851/18851107.png',
         ]);
     }
 
@@ -398,11 +400,33 @@ class AuthController extends Controller
             ]);
         }
 
+        if ($request->hasFile("file_imagen")) {
+            if ($user->avatar) {
+                Storage::delete($user->avatar);
+            }
+            $path = Storage::putFile("users", $request->file("file_imagen"));
+            $request->request->add(["avatar" => $path]);
+        }
+
         // Actualizar otros datos del usuario
         $user->update($request->except(["password", "current_password"]));
+
+        // Limpiar toda la caché de productos
+        $this->clearAllProductCaches();
 
         return response()->json([
             "message" => 200,
         ]);
+    }
+
+    private function clearAllProductCaches()
+    {
+        // Limpiar la caché de la página principal
+        $currentHour = now()->format('Y-m-d_H');
+        Cache::forget("home_response_{$currentHour}");
+
+        // Limpiar todos los productos en caché
+        // Esto borra cualquier caché que comience con "product_"
+        Cache::flush();
     }
 }

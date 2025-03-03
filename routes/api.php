@@ -99,7 +99,7 @@ Route::group([
             Route::post("checkout-mercadopago", [SaleController::class, "checkout_mercadopago"]);
 
             Route::get("profile_client/me", [AuthController::class, "me"]);
-            Route::put("profile_client", [AuthController::class, "update"]);
+            Route::post("profile_client", [AuthController::class, "update"]);
             Route::get("profile_client/orders", [SaleController::class, "orders"]);
 
             Route::resource("reviews", ReviewController::class);
