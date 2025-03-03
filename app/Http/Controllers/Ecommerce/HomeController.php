@@ -78,7 +78,7 @@ class HomeController extends Controller
 
             $discount = $this->getProductDiscount($product, $request->get("campaing_discount"));
             $relatedProducts = $this->getRelatedProducts($product);
-            $reviews = Review::where("product_id", $product->id)->get();
+            $reviews = Review::where("product_id", $product->id)->orderBy("id", "desc")->get();
 
             // Calcular la distribución de calificaciones
             $ratingSummary = [
@@ -116,7 +116,6 @@ class HomeController extends Controller
                     ];
                 }),
                 "rating_distribution" => $ratingDistribution,
-                "total_reviews" => $totalReviews
             ]);
         });
     }
