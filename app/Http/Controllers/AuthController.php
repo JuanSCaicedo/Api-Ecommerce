@@ -352,6 +352,7 @@ class AuthController extends Controller
             "user" => [
                 "full_name" => auth('api')->user()->name . ' ' . auth('api')->user()->surname,
                 "email" => auth('api')->user()->email,
+                "name" => auth('api')->user()->name,
             ],
         ]);
     }
