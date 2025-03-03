@@ -80,6 +80,24 @@ class HomeController extends Controller
             $relatedProducts = $this->getRelatedProducts($product);
             $reviews = Review::where("product_id", $product->id)->get();
 
+            // Calcular la distribución de calificaciones
+            $ratingSummary = [
+                5 => 0,
+                4 => 0,
+                3 => 0,
+                2 => 0,
+                1 => 0,
+            ];
+
+            foreach ($reviews as $review) {
+                $ratingSummary[$review->rating]++;
+            }
+
+            $totalReviews = $reviews->count();
+            $ratingDistribution = array_map(function ($count) use ($totalReviews) {
+                return $totalReviews > 0 ? round(($count / $totalReviews) * 100, 2) : 0;
+            }, $ratingSummary);
+
             return response()->json([
                 "message" => 200,
                 "product" => ProductEcommerceResource::make($product),
@@ -97,6 +115,8 @@ class HomeController extends Controller
                         "created_at" => $review->created_at->format("Y-m-d h:i A")
                     ];
                 }),
+                "rating_distribution" => $ratingDistribution,
+                "total_reviews" => $totalReviews
             ]);
         });
     }
