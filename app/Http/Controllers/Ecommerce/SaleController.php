@@ -15,6 +15,7 @@ use App\Models\Sale\SaleAddres;
 use App\Models\Sale\SaleDetail;
 use App\Models\Sale\SaleTemp;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
 use MercadoPago\Client\Preference\PreferenceClient;
@@ -83,6 +84,9 @@ class SaleController extends Controller
         $sale_addres = $request->sale_address;
         $sale_addres['sale_id'] = $sale->id;
         $sale_address = SaleAddres::create($sale_addres);
+
+        // Limpiar toda la caché de productos
+        $this->clearAllProductCaches();
 
         //Enviar correo de la compra
         $sale_new = Sale::findOrfail($sale->id);
@@ -267,6 +271,9 @@ class SaleController extends Controller
         $sale_addres['sale_id'] = $sale->id;
         $sale_address = SaleAddres::create($sale_addres);
 
+        // Limpiar toda la caché de productos
+        $this->clearAllProductCaches();
+
         //Enviar correo de la compra
         $sale_new = Sale::findOrfail($sale->id);
         Mail::to(auth("api")->user()->email)->send(new SaleMail(auth("api")->user(), $sale_new));
@@ -286,5 +293,16 @@ class SaleController extends Controller
             "sales" => SaleCollection::make($sales),
             "total" => $sales->total(),
         ]);
+    }
+
+    private function clearAllProductCaches()
+    {
+        // Limpiar la caché de la página principal
+        $currentHour = now()->format('Y-m-d_H');
+        Cache::forget("home_response_{$currentHour}");
+
+        // Limpiar todos los productos en caché
+        // Esto borra cualquier caché que comience con "product_"
+        Cache::flush();
     }
 }
