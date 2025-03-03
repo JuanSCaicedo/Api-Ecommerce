@@ -18,6 +18,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;
 use MercadoPago\Client\Preference\PreferenceClient;
 use MercadoPago\MercadoPagoConfig;
 
@@ -43,6 +44,11 @@ class SaleController extends Controller
 
         $request->request->add(['user_id' => auth("api")->user()->id]);
         $sale = Sale::create($request->all());
+
+        if ($request->hasFile("file_imagen")) {
+            $path = Storage::putFile("comprobantes", $request->file("file_imagen"));
+            $sale->update(["comprobante" => $path]);
+        }
 
         $carts = Cart::where('user_id', auth("api")->user()->id)->get();
 

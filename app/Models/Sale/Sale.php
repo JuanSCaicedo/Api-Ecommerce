@@ -22,6 +22,7 @@ class Sale extends Model
         "total",
         "price_dolar",
         "n_transaccion",
+        "comprobante",
         "description",
         "preference_id",
     ];
