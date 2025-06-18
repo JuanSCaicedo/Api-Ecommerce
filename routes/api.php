@@ -97,11 +97,9 @@ Route::group([
             Route::get("sale/{id}", [SaleController::class, "show"]);
             Route::get("mercadopago", [SaleController::class, "mercadopago"]);
             Route::post("checkout-mercadopago", [SaleController::class, "checkout_mercadopago"]);
-
             Route::get("profile_client/me", [AuthController::class, "me"]);
             Route::post("profile_client", [AuthController::class, "update"]);
             Route::get("profile_client/orders", [SaleController::class, "orders"]);
-
             Route::resource("reviews", ReviewController::class);
         }
     );
