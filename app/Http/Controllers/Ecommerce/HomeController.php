@@ -372,4 +372,13 @@ class HomeController extends Controller
             ]),
         ]);
     }
+
+    //Filtros productos
+    public function config_filter_advance() {
+        
+    }
+
+    public function filter_advance_product(Request $request) {
+        
+    }
 }
