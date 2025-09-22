@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Propertie extends Model
 {
     use HasFactory;
-    
+
     use SoftDeletes;
 
     protected $fillable = [
@@ -24,7 +24,7 @@ class Propertie extends Model
         date_default_timezone_set('America/Bogota');
         $this->attributes['created_at'] = Carbon::now();
     }
-    
+
     public function setUpdatedAtAttribute($value)
     {
         date_default_timezone_set('America/Bogota');
@@ -39,5 +39,10 @@ class Propertie extends Model
     public function variations()
     {
         return $this->hasMany(ProductVariation::class);
+    }
+
+    public function attribute()
+    {
+        return $this->belongsTo(Attribute::class);
     }
 }

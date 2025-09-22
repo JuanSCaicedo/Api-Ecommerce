@@ -7,8 +7,10 @@ use App\Http\Resources\Ecommerce\Product\ProductEcommerceCollection;
 use App\Http\Resources\Ecommerce\Product\ProductEcommerceResource;
 use App\Models\Discount\Discount;
 use App\Models\HomeView;
+use App\Models\Product\Brand;
 use App\Models\Product\Categorie;
 use App\Models\Product\Product;
+use App\Models\Product\Propertie;
 use App\Models\Sale\Review;
 use App\Models\Slider;
 use Carbon\Carbon;
@@ -374,11 +376,41 @@ class HomeController extends Controller
     }
 
     //Filtros productos
-    public function config_filter_advance() {
-        
+    public function config_filter_advance()
+    {
+
+        $categories = Categorie::withCount(["product_categorie_firsts"])
+            ->whereNull(["categorie_second_id", "categorie_third_id"])
+            ->where("state", 1)
+            ->get();
+
+        $brands = Brand::withCount(["products"])
+            ->where("state", 1)
+            ->get();
+
+        $colors = Propertie::where("code", "<>", null)
+            ->get();
+
+        return response()->json([
+            "categories" => $categories->map(fn($cat) => [
+                "id" => $cat->id,
+                "name" => $cat->name,
+                "products_count" => $cat->product_categorie_firsts_count,
+                "imagen" => $cat->imagen ? env("APP_URL") . "storage/" . $cat->imagen : null,
+            ]),
+
+            "brands" => $brands->map(fn($brand) => [
+                "id" => $brand->id,
+                "name" => $brand->name,
+                "products_count" => $brand->products_count,
+            ]),
+
+            "colors" => $colors->map(function ($color) {
+                $color->products_count = $color->attribute->variations->unique("product_id")->count();
+                return $color;
+            }),
+        ]);
     }
 
-    public function filter_advance_product(Request $request) {
-        
-    }
+    public function filter_advance_product(Request $request) {}
 }
