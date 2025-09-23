@@ -391,6 +391,8 @@ class HomeController extends Controller
         $colors = Propertie::where("code", "<>", null)
             ->get();
 
+        $product_relateds = Product::where("state", 2)->inRandomOrder()->limit(4)->get();
+
         return response()->json([
             "categories" => $categories->map(fn($cat) => [
                 "id" => $cat->id,
@@ -409,8 +411,17 @@ class HomeController extends Controller
                 $color->products_count = $color->attribute->variations->unique("product_id")->count();
                 return $color;
             }),
+
+            "product_relateds" => ProductEcommerceCollection::make($product_relateds),
         ]);
     }
 
-    public function filter_advance_product(Request $request) {}
+    public function filter_advance_product(Request $request)
+    {
+        $products = Product::orderBy("id", "desc")->where("state", 2)->get();
+
+        return response()->json([
+            "productos" => ProductEcommerceCollection::make($products),
+        ]);
+    }
 }
