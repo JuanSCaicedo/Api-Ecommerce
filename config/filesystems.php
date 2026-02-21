@@ -64,6 +64,7 @@ return [
             'region' => env('OCI_DEFAULT_REGION'),
             'bucket' => env('OCI_BUCKET'),
             'endpoint' => env('OCI_ENDPOINT'),
+            'url' => env('OCI_URL'),
             'use_path_style_endpoint' => true,
             'http' => [
                 'verify' => env('AWS_ENDPOINT_SSL_VERIFY', true),

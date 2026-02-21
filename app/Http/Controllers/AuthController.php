@@ -256,7 +256,7 @@ class AuthController extends Controller
             'tw' => $user->tw,
             'sexo' => $user->sexo,
             'address_city' => $user->address_city,
-            'avatar' => $user->avatar ? env("APP_URL") . "storage/" . $user->avatar : 'https://cdn-icons-png.flaticon.com/512/18851/18851107.png',
+            'avatar' => $user->avatar ? Storage::disk('oci')->url($user->avatar) : 'https://cdn-icons-png.flaticon.com/512/18851/18851107.png',
         ]);
     }
 
@@ -403,9 +403,9 @@ class AuthController extends Controller
 
         if ($request->hasFile("file_imagen")) {
             if ($user->avatar) {
-                Storage::delete($user->avatar);
+                Storage::disk('oci')->delete($user->avatar);
             }
-            $path = Storage::putFile("users", $request->file("file_imagen"));
+            $path = Storage::disk('oci')->putFile("juandevops/ecommerce/public/users", $request->file("file_imagen"));
             $request->request->add(["avatar" => $path]);
         }
 
