@@ -39,7 +39,7 @@ return [
         'public' => [
             'driver' => 'local',
             'root' => storage_path('app/public'),
-            'url' => env('APP_URL').'/storage',
+            'url' => env('APP_URL') . '/storage',
             'visibility' => 'public',
             'throw' => false,
         ],
@@ -56,6 +56,21 @@ return [
             'throw' => false,
         ],
 
+        // Configuración para Oracle Cloud Object Storage
+        'oci' => [
+            'driver' => 's3',
+            'key' => env('OCI_ACCESS_KEY_ID'),
+            'secret' => env('OCI_SECRET_ACCESS_KEY'),
+            'region' => env('OCI_DEFAULT_REGION'),
+            'bucket' => env('OCI_BUCKET'),
+            'endpoint' => env('OCI_ENDPOINT'),
+            'use_path_style_endpoint' => true,
+            'http' => [
+                'verify' => env('AWS_ENDPOINT_SSL_VERIFY', true),
+            ],
+            'throw' => false,
+            'report' => false,
+        ],
     ],
 
     /*
