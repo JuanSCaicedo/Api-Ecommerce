@@ -54,7 +54,7 @@ class CategorieController extends Controller
             return response()->json(["message" => 403]);
         }
         if ($request->hasFile("image")) {
-            $path = Storage::putFile("categories", $request->file("image"));
+            $path = Storage::disk('oci')->putFile("juandevops/ecommerce/public/categories", $request->file("image"));
             $request->request->add(["imagen" =>  $path]);
         }
 
@@ -91,15 +91,15 @@ class CategorieController extends Controller
         if ($request->has('image')) {
             if ($request->image == '') {
                 if ($categorie->imagen) {
-                    Storage::delete($categorie->imagen);
+                    Storage::disk('oci')->delete($categorie->imagen);
                     $categorie->imagen = null;
                     $categorie->save();
                 }
             } else if ($request->hasFile('image')) {
                 if ($categorie->imagen) {
-                    Storage::delete($categorie->imagen);
+                    Storage::disk('oci')->delete($categorie->imagen);
                 }
-                $path = Storage::putFile("categories", $request->file('image'));
+                $path = Storage::disk('oci')->putFile("juandevops/ecommerce/public/categories", $request->file('image'));
                 $request->request->add(["imagen" => $path]);
             }
         }
@@ -119,7 +119,7 @@ class CategorieController extends Controller
 
         // Verificar si el slider tiene una imagen y eliminarla si existe
         if ($categorie->imagen) {
-            Storage::delete($categorie->imagen);
+            Storage::disk('oci')->delete($categorie->imagen);
         }
 
         if (
