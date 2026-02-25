@@ -3,73 +3,61 @@ name: Laravel CI/CD
 on:
   push:
     branches: [ main ]
-  pull_request:
-    branches: [ main ]
 
 concurrency:
-  group: ci-${{ github.ref }}
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-      # 1️⃣ Clonar repositorio (para entorno de GitHub Actions)
-      - name: Clonar repositorio
-        uses: actions/checkout@v3
-
-      # 2️⃣ Conectar al servidor y actualizar la API
-      - name: Actualizar API Laravel
+      - name: 🚀 Deploy Laravel vía SSH
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            # Navegar al proyecto
-            cd /home/api-ecommerce.juandevops.com/public_html
+            set -e
 
-            # Asegurar que el repositorio usa SSH
-            git remote set-url origin git@github.com:JuanSCaicedo/Api-Ecommerce.git
+            PROJECT_PATH="/home/api-ecommerce.juandevops.com/public_html"
 
-            # Agregar GitHub al known_hosts para evitar el prompt de autenticación
+            echo "▶ Entrando al proyecto"
+            cd $PROJECT_PATH
+
+            echo "▶ Asegurando SSH con GitHub"
+            mkdir -p ~/.ssh
             ssh-keyscan github.com >> ~/.ssh/known_hosts
 
-            # Ajustar permisos en el repositorio si es necesario
-            sudo chown -R $USER:$USER .git
+            echo "▶ Usando repositorio por SSH"
+            git remote set-url origin git@github.com:JuanSCaicedo/Api-Ecommerce.git
 
-            # Reiniciar cambios en local
-            sudo git reset --hard
+            echo "▶ Reset y pull limpio"
+            git reset --hard HEAD
+            git pull origin main
 
-            # 👉 Ejecutar git pull usando la clave SSH correcta
-            sudo GIT_SSH_COMMAND="ssh -i /github-ssh/github-ssh" git pull origin main
+            echo "▶ Instalando dependencias (producción)"
+            composer install \
+              --no-dev \
+              --optimize-autoloader \
+              --no-interaction
 
-            # Instalar dependencias
-            composer install --no-dev --optimize-autoloader
+            echo "▶ Permisos correctos"
+            sudo chown -R www-data:www-data storage bootstrap/cache
+            sudo chmod -R 775 storage bootstrap/cache
 
-            # Ajustar permisos del directorio storage
-            sudo chown -R www-data: storage
-            sudo chmod -R 777 storage
+            echo "▶ Limpiando caché"
+            php artisan optimize:clear
 
-            # Limpiar cachés de Laravel
+            echo "▶ Regenerando caché segura"
             php artisan config:cache
-            php artisan route:cache
             php artisan view:cache
+            # route:cache SOLO si no usas closures
+            php artisan route:cache || echo "⚠ Route cache omitido"
 
-            # Reiniciar servidor web
+            echo "▶ Reiniciando servidor web"
             sudo systemctl restart lsws
 
-      - name: Actualizar dependencias de la API
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.SERVER_HOST }}
-          username: ${{ secrets.SERVER_USERNAME }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          script: |
-            # Navegar al proyecto
-            cd /home/api-ecommerce.juandevops.com/public_html
-
-            # Actualizar dependencias
-            sudo composer update --no-interaction
-            sudo php artisan config:clear
-            sudo php artisan cache:clear
+            echo "✅ Deploy completado correctamente"
