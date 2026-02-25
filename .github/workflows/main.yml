@@ -40,8 +40,7 @@ jobs:
               git remote set-url origin git@github.com:JuanSCaicedo/Api-Ecommerce.git
 
               echo "▶ Pull limpio del código"
-              git fetch origin
-              git reset --hard origin/main
+              git pull origin main
 
               echo "▶ Instalando dependencias"
               composer install \
@@ -49,10 +48,15 @@ jobs:
                 --optimize-autoloader \
                 --no-interaction
 
+              echo "▶ Actualizar dependencias"
+              composer update \
+                --no-dev \
+                --optimize-autoloader \
+                --no-interaction
+
               echo "▶ Asegurando permisos de Laravel"
-              sudo chown -R $USER:www-data storage bootstrap/cache
-              sudo chmod -R 775 storage bootstrap/cache
-              sudo find storage bootstrap/cache -type d -exec chmod g+s {} \;
+              sudo chmod -R 777 /home/api-ecommerce.juandevops.com/public_html/storage/logs/laravel.log
+              sudo chmod -R 777 /home/api-ecommerce.juandevops.com/public_html/storage/framework/cache/data
 
               echo "▶ Limpiando caché"
               php artisan optimize:clear
