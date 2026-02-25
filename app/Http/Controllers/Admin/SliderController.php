@@ -33,7 +33,7 @@ class SliderController extends Controller
                     "title" => $slider->title,
                     "subtitle" => $slider->subtitle,
                     "label" => $slider->label,
-                    "imagen" => env("APP_URL") . "storage/" . $slider->imagen,
+                    "imagen" => $slider->imagen ? Storage::disk('oci')->url($slider->imagen) : null,
                     "link" => $slider->link,
                     "state" => $slider->state,
                     "type_slider" => $slider->type_slider,
@@ -52,7 +52,7 @@ class SliderController extends Controller
     public function store(Request $request)
     {
         if ($request->hasFile("image")) {
-            $path = Storage::putFile("sliders", $request->file("image"));
+            $path = Storage::disk('oci')->putFile("juandevops/ecommerce/public/sliders", $request->file("image"));
             $request->request->add(["imagen" =>  $path]);
         }
 
@@ -78,7 +78,7 @@ class SliderController extends Controller
             "title" => $slider->title,
             "subtitle" => $slider->subtitle,
             "label" => $slider->label,
-            "imagen" => env("APP_URL") . "storage/" . $slider->imagen,
+            "imagen" => $slider->imagen ? Storage::disk('oci')->url($slider->imagen) : null,
             "link" => $slider->link,
             "state" => $slider->state,
             "type_slider" => $slider->type_slider,
@@ -98,15 +98,15 @@ class SliderController extends Controller
         if ($request->has('image')) {
             if ($request->image == '') {
                 if ($slider->imagen) {
-                    Storage::delete($slider->imagen);
+                    Storage::disk('oci')->delete($slider->imagen);
                     $slider->imagen = null;
                     $slider->save();
                 }
             } else if ($request->hasFile('image')) {
                 if ($slider->imagen) {
-                    Storage::delete($slider->imagen);
+                    Storage::disk('oci')->delete($slider->imagen);
                 }
-                $path = Storage::putFile("sliders", $request->file('image'));
+                $path = Storage::disk('oci')->putFile("juandevops/ecommerce/public/sliders", $request->file('image'));
                 $request->request->add(["imagen" => $path]);
             }
         }
@@ -126,7 +126,7 @@ class SliderController extends Controller
 
         // Verificar si el slider tiene una imagen y eliminarla si existe
         if ($slider->imagen) {
-            Storage::delete($slider->imagen);
+            Storage::disk('oci')->delete($slider->imagen);
         }
 
         $slider->delete();
