@@ -16,6 +16,7 @@ use App\Models\Slider;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Storage;
 
 class HomeController extends Controller
 {
@@ -343,7 +344,7 @@ class HomeController extends Controller
             "id" => $cat->id,
             "name" => $cat->name,
             "product_categorie_firsts_count" => $cat->product_categorie_firsts_count,
-            "imagen" => $cat->imagen ? env("APP_URL") . "storage/" . $cat->imagen : null,
+            "imagen" => $cat->imagen ? Storage::disk('oci')->url($cat->imagen) : null,
         ]);
     }
 
