@@ -1,25 +1,60 @@
-name: Laravel CI/CD
+name: Deploy Laravel (SSH)
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
 
 concurrency:
-  group: ci-${{ github.ref }}
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  ssh-test:
+  deploy:
+    name: Deploy via SSH
     runs-on: ubuntu-latest
 
     steps:
-      - name: Probar conexión SSH al servidor
+      - name: 🔐 Conectar por SSH al servidor
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 22
+          timeout: 60s
+          command_timeout: 20m
           script: |
+            set -e
+
             echo "✅ Conexión SSH exitosa"
             hostname
             whoami
-            pwd
+
+            echo "📁 Entrando al proyecto"
+            cd /home/api-ecommerce.juandevops.com/public_html
+
+            echo "🔄 Sincronizando código"
+            git reset --hard
+            git pull origin main
+
+            echo "📦 Instalando dependencias"
+            composer install \
+              --no-dev \
+              --optimize-autoloader \
+              --no-interaction
+
+            echo "🔐 Ajustando permisos"
+            sudo chown -R www-data:www-data storage bootstrap/cache
+            sudo chmod -R 775 storage bootstrap/cache
+
+            echo "🧹 Limpiando caché"
+            php artisan optimize:clear
+
+            echo "⚡ Optimizando Laravel"
+            php artisan optimize
+
+            echo "🔁 Reiniciando servidor web"
+            sudo systemctl restart lsws
+
+            echo "🚀 Deploy completado con éxito"
