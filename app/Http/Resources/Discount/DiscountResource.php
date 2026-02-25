@@ -5,6 +5,7 @@ namespace App\Http\Resources\Discount;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Storage;
 
 class DiscountResource extends JsonResource
 {
@@ -32,7 +33,7 @@ class DiscountResource extends JsonResource
                     "id" => $product_aux->product->id,
                     "title" => $product_aux->product->title,
                     "slug" => $product_aux->product->slug,
-                    "imagen" => env("APP_URL") . "storage/" . $product_aux->product->imagen,
+                    "imagen" => $product_aux->product->imagen ? Storage::disk('oci')->url($product_aux->product->imagen) : null,
                     "id_aux" => $product_aux->id,
                 ];
             }),
@@ -41,7 +42,7 @@ class DiscountResource extends JsonResource
                 return [
                     "id" => $categorie_aux->categorie->id,
                     "name" => $categorie_aux->categorie->name,
-                    "imagen" => env("APP_URL") . "storage/" . $categorie_aux->categorie->imagen,
+                    "imagen" => $categorie_aux->categorie->imagen ? Storage::disk('oci')->url($categorie_aux->categorie->imagen) : null,
                     "id_aux" => $categorie_aux->id,
                 ];
             }),

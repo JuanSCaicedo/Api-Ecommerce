@@ -4,6 +4,7 @@ namespace App\Http\Resources\Ecommerce\Sale;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Storage;
 
 class SaleResource extends JsonResource
 {
@@ -36,7 +37,7 @@ class SaleResource extends JsonResource
                         "slug"  => $sale_detail->product->slug,
                         "price_pen"  => $sale_detail->product->price_pen,
                         "price_usd"  => $sale_detail->product->price_usd,
-                        "imagen"  => env("APP_URL") . "storage/" . $sale_detail->product->imagen,
+                        "imagen"  => $sale_detail->product->imagen ? Storage::disk('oci')->url($sale_detail->product->imagen) : null,
                         "brand_id"  => $sale_detail->product->brand_id,
                         "brand" => $sale_detail->product->brand ? [
                             "id" => $sale_detail->product->brand->id,

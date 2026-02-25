@@ -4,6 +4,7 @@ namespace App\Http\Resources\Cupone;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Storage;
 
 class CuponeResource extends JsonResource
 {
@@ -29,7 +30,7 @@ class CuponeResource extends JsonResource
                 return [
                     "id" => $product_aux->product->id,
                     "title" => $product_aux->product->title,
-                    "imagen" => env("APP_URL") . "storage/" . $product_aux->product->imagen,
+                    "imagen" => $product_aux->product->imagen ? Storage::disk('oci')->url($product_aux->product->imagen) : null,
                     "id_aux" => $product_aux->product_id,
                 ];
             }),
@@ -38,7 +39,7 @@ class CuponeResource extends JsonResource
                 return [
                     "id" => $categorie_aux->categorie->id,
                     "name" => $categorie_aux->categorie->name,
-                    "imagen" => env("APP_URL") . "storage/" . $categorie_aux->categorie->imagen,
+                    "imagen" => $categorie_aux->categorie->imagen ? Storage::disk('oci')->url($categorie_aux->categorie->imagen) : null,
                     "id_aux" => $categorie_aux->id,
                 ];
             }),

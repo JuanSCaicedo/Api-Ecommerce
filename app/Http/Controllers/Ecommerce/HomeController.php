@@ -111,7 +111,7 @@ class HomeController extends Controller
                         "id" => $review->id,
                         "user" => [
                             "full_name" => $review->user->name . ' ' . $review->user->surname,
-                            'avatar' => $review->user->avatar ? env("APP_URL") . "storage/" . $review->user->avatar : 'https://cdn-icons-png.flaticon.com/512/18851/18851107.png',
+                            'avatar' => $review->user->avatar ? Storage::disk('oci')->url($review->user->avatar) : 'https://cdn-icons-png.flaticon.com/512/18851/18851107.png',
                         ],
                         "message" => $review->message,
                         "rating" => $review->rating,
@@ -327,7 +327,7 @@ class HomeController extends Controller
             "title" => $slider->title,
             "subtitle" => $slider->subtitle,
             "label" => $slider->label,
-            "imagen" => $slider->imagen ? env("APP_URL") . "storage/" . $slider->imagen : null,
+            "imagen" => $slider->imagen ? Storage::disk('oci')->url($slider->imagen) : null,
             "link" => $slider->link,
             "state" => $slider->state,
             "color" => $slider->color,
@@ -366,11 +366,11 @@ class HomeController extends Controller
             "categories" => $dept->categorie_seconds->map(fn($cat) => [
                 "id" => $cat->id,
                 "name" => $cat->name,
-                "imagen" => $cat->imagen ? env("APP_URL") . "storage/" . $cat->imagen : null,
+                "imagen" => $cat->imagen ? Storage::disk('oci')->url($cat->imagen) : null,
                 "subcategories" => $cat->categorie_seconds->map(fn($subcat) => [
                     "id" => $subcat->id,
                     "name" => $subcat->name,
-                    "imagen" => $subcat->imagen ? env("APP_URL") . "storage/" . $subcat->imagen : null,
+                    "imagen" => $subcat->imagen ? Storage::disk('oci')->url($subcat->imagen) : null,
                 ]),
             ]),
         ]);
@@ -399,7 +399,7 @@ class HomeController extends Controller
                 "id" => $cat->id,
                 "name" => $cat->name,
                 "products_count" => $cat->product_categorie_firsts_count,
-                "imagen" => $cat->imagen ? env("APP_URL") . "storage/" . $cat->imagen : null,
+                "imagen" => $cat->imagen ? Storage::disk('oci')->url($cat->imagen) : null,
             ]),
 
             "brands" => $brands->map(fn($brand) => [

@@ -13,6 +13,7 @@ use App\Models\Product\Brand;
 use App\Models\Product\Categorie;
 use App\Models\Product\Product;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class CuponeController extends Controller
 {
@@ -48,7 +49,7 @@ class CuponeController extends Controller
                     "id" => $product->id,
                     "title" => $product->title,
                     "slug" => $product->slug,
-                    "imagen" => env("APP_URL") . "storage/" . $product->imagen,
+                    "imagen" => $product->imagen ? Storage::disk('oci')->url($product->imagen) : null,
                 ];
             }),
 
@@ -56,7 +57,7 @@ class CuponeController extends Controller
                 return [
                     "id" => $categorie->id,
                     "name" => $categorie->name,
-                    "imagen" => env("APP_URL") . "storage/" . $categorie->imagen,
+                    "imagen" => $categorie->imagen ? Storage::disk('oci')->url($categorie->imagen) : null,
                 ];
             }),
 

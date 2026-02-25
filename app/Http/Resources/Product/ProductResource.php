@@ -4,6 +4,7 @@ namespace App\Http\Resources\Product;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Storage;
 
 use function PHPSTORM_META\map;
 
@@ -24,7 +25,7 @@ class ProductResource extends JsonResource
             "price_cop" => $this->resource->price_cop,
             "price_usd" => $this->resource->price_usd,
             "resumen" => $this->resource->resumen,
-            "imagen" => $this->resource->imagen ? env("APP_URL") . "storage/" . $this->resource->imagen : NULL,
+            "imagen" => $this->resource->imagen ? Storage::disk('oci')->url($this->resource->imagen) : NULL,
             "state" => $this->resource->state,
             "description" => $this->resource->description,
             "tags" => $this->resource->tags ? json_decode($this->resource->tags) : [],
@@ -61,7 +62,7 @@ class ProductResource extends JsonResource
             "images" => $this->resource->images->map(function ($image) {
                 return [
                     "id" => $image->id,
-                    "imagen" => env("APP_URL") . "storage/" . $image->imagen,
+                    "imagen" => Storage::disk('oci')->url($image->imagen),
                 ];
             }),
         ];

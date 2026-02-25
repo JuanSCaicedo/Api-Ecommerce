@@ -76,7 +76,7 @@ class ProductController extends Controller
         }
 
         if ($request->hasFile("portada")) {
-            $path = Storage::putFile("products", $request->file("portada"));
+            $path = Storage::disk('oci')->putFile("juandevops/ecommerce/public/products", $request->file("portada"));
             $request->request->add(["imagen" => $path]);
         }
 
@@ -98,7 +98,7 @@ class ProductController extends Controller
         $product_id = $request->product_id;
 
         if ($request->hasFile("imagen_add")) {
-            $path = Storage::putFile("products", $request->file("imagen_add"));
+            $path = Storage::disk('oci')->putFile("juandevops/ecommerce/public/products", $request->file("imagen_add"));
         }
 
         $product_imagen = ProductImage::create(([
@@ -111,7 +111,7 @@ class ProductController extends Controller
         return response()->json([
             "imagen" => [
                 "id" => $product_imagen->id,
-                "imagen" => env("APP_URL") . "storage/" . $product_imagen->imagen,
+                "imagen" => Storage::disk('oci')->url($product_imagen->imagen),
             ],
         ]);
     }
@@ -148,10 +148,10 @@ class ProductController extends Controller
         if ($request->hasFile("portada")) {
 
             if ($product->imagen) {
-                Storage::delete($product->imagen);
+                Storage::disk('oci')->delete($product->imagen);
             }
 
-            $path = Storage::putFile("products", $request->file("portada"));
+            $path = Storage::disk('oci')->putFile("juandevops/ecommerce/public/products", $request->file("portada"));
             $request->request->add(["imagen" => $path]);
         }
 
@@ -177,14 +177,14 @@ class ProductController extends Controller
         // Verificar y eliminar imágenes asociadas al producto
         foreach ($product->images as $image) {
             if ($image->imagen) {
-                Storage::delete($image->imagen);
+                Storage::disk('oci')->delete($image->imagen);
             }
             $image->delete();
         }
 
         // Verificar si el slider tiene una imagen y eliminarla si existe
         if ($product->imagen) {
-            Storage::delete($product->imagen);
+            Storage::disk('oci')->delete($product->imagen);
         }
 
         //No se puede eliminar un producto que tenga una venta
@@ -203,7 +203,7 @@ class ProductController extends Controller
 
         // Verificar si el slider tiene una imagen y eliminarla si existe
         if ($product->imagen) {
-            Storage::delete($product->imagen);
+            Storage::disk('oci')->delete($product->imagen);
         }
 
         $product->delete();

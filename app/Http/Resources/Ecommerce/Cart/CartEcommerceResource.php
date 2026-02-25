@@ -4,6 +4,7 @@ namespace App\Http\Resources\Ecommerce\Cart;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Storage;
 
 class CartEcommerceResource extends JsonResource
 {
@@ -24,7 +25,7 @@ class CartEcommerceResource extends JsonResource
                 "slug"  => $this->resource->product->slug,
                 "price_pen"  => $this->resource->product->price_pen,
                 "price_usd"  => $this->resource->product->price_usd,
-                "imagen"  => env("APP_URL") . "storage/" . $this->resource->product->imagen,
+                "imagen"  => $this->resource->product->imagen ? Storage::disk('oci')->url($this->resource->product->imagen) : null,
                 "brand_id"  => $this->resource->product->brand_id,
                 "brand" => $this->resource->product->brand ? [
                     "id" => $this->resource->product->brand->id,
