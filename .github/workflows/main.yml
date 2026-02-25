@@ -18,43 +18,51 @@ jobs:
           username: ${{ secrets.SERVER_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            set -e
+              set -e
 
-            PROJECT_PATH="/home/api-ecommerce.juandevops.com/public_html"
+              PROJECT_PATH="/home/api-ecommerce.juandevops.com/public_html"
 
-            echo "▶ Entrando al proyecto"
-            cd $PROJECT_PATH
+              echo "▶ Entrando al proyecto"
+              cd $PROJECT_PATH
 
-            echo "▶ Asegurando known_hosts"
-            mkdir -p ~/.ssh
-            ssh-keyscan github.com >> ~/.ssh/known_hosts
+              echo "▶ Asegurando known_hosts"
+              mkdir -p ~/.ssh
+              ssh-keyscan github.com >> ~/.ssh/known_hosts
 
-            echo "▶ Usando repo por SSH"
-            git remote set-url origin git@github.com:JuanSCaicedo/Api-Ecommerce.git
+              echo "▶ Registrando safe.directory"
+              git config --global --add safe.directory $PROJECT_PATH
 
-            echo "▶ Tomando ownership para el deploy"
-            sudo chown -R $USER:www-data $PROJECT_PATH
-            sudo chmod -R 775 $PROJECT_PATH
+              echo "▶ Tomando ownership para el deploy"
+              sudo chown -R $USER:www-data $PROJECT_PATH
+              sudo chmod -R 775 $PROJECT_PATH
 
-            echo "▶ Pull limpio del código"
-            git fetch origin
-            git reset --hard origin/main
+              echo "▶ Usando repo por SSH"
+              git remote set-url origin git@github.com:JuanSCaicedo/Api-Ecommerce.git
 
-            echo "▶ Instalando dependencias"
-            composer install \
-              --no-dev \
-              --optimize-autoloader \
-              --no-interaction
+              echo "▶ Pull limpio del código"
+              git fetch origin
+              git reset --hard origin/main
 
-            echo "▶ Asegurando permisos de Laravel"
-            sudo chown -R $USER:www-data storage bootstrap/cache
-            sudo chmod -R 775 storage bootstrap/cache
-            sudo find storage bootstrap/cache -type d -exec chmod g+s {} \;
+              echo "▶ Instalando dependencias"
+              composer install \
+                --no-dev \
+                --optimize-autoloader \
+                --no-interaction
 
-            echo "▶ Limpiando caché"
-            php artisan optimize:clear
+              echo "▶ Asegurando permisos de Laravel"
+              sudo chown -R $USER:www-data storage bootstrap/cache
+              sudo chmod -R 775 storage bootstrap/cache
+              sudo find storage bootstrap/cache -type d -exec chmod g+s {} \;
 
-            echo "▶ Regenerando caché"
-            php artisan config:cache
-            php artisan view:cache
-            php artisan route:cache || echo "⚠ route:cache omitido"
+              echo "▶ Limpiando caché"
+              php artisan optimize:clear
+
+              echo "▶ Regenerando caché"
+              php artisan config:cache
+              php artisan view:cache
+              php artisan route:cache || echo "⚠ route:cache omitido"
+
+              echo "▶ Reiniciando servidor"
+              sudo systemctl restart lsws
+
+              echo "✅ Deploy finalizado correctamente"
