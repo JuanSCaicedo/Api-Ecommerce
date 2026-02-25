@@ -46,7 +46,7 @@ class SaleController extends Controller
         $sale = Sale::create($request->all());
 
         if ($request->hasFile("file_imagen")) {
-            $path = Storage::putFile("comprobantes", $request->file("file_imagen"));
+            $path = Storage::disk('oci')->putFile("juandevops/ecommerce/public/comprobantes", $request->file("file_imagen"));
             $sale->update(["comprobante" => $path]);
         }
 
