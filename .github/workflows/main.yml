@@ -1,19 +1,17 @@
-name: Laravel CI/CD
+name: Deploy Laravel API
 
 on:
   push:
-    branches: [ main ]
-
-concurrency:
-  group: deploy-${{ github.ref }}
-  cancel-in-progress: true
+    branches:
+      - main
 
 jobs:
   deploy:
+    name: Deploy to Server
     runs-on: ubuntu-latest
 
     steps:
-      - name: 🚀 Deploy Laravel vía SSH
+      - name: Ejecutar deploy por SSH
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.SERVER_HOST }}
@@ -34,9 +32,9 @@ jobs:
             echo "▶ Usando repo por SSH"
             git remote set-url origin git@github.com:JuanSCaicedo/Api-Ecommerce.git
 
-            echo "▶ Pull limpio"
-            git reset --hard HEAD
-            git pull origin main
+            echo "▶ Pull limpio del código"
+            git fetch origin
+            git reset --hard origin/main
 
             echo "▶ Instalando dependencias"
             composer install \
@@ -44,7 +42,7 @@ jobs:
               --optimize-autoloader \
               --no-interaction
 
-            echo "▶ Permisos Laravel"
+            echo "▶ Asegurando permisos de Laravel"
             sudo chown -R www-data:www-data storage bootstrap/cache
             sudo chmod -R 775 storage bootstrap/cache
 
@@ -59,4 +57,4 @@ jobs:
             echo "▶ Reiniciando servidor"
             sudo systemctl restart lsws
 
-            echo "✅ Deploy finalizado"
+            echo "✅ Deploy finalizado correctamente"
