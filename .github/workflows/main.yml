@@ -32,6 +32,9 @@ jobs:
             echo "▶ Usando repo por SSH"
             git remote set-url origin git@github.com:JuanSCaicedo/Api-Ecommerce.git
 
+            echo "▶ Tomando ownership para el deploy"
+            sudo chown -R $USER:$USER $PROJECT_PATH
+
             echo "▶ Pull limpio del código"
             git fetch origin
             git reset --hard origin/main
@@ -45,6 +48,7 @@ jobs:
             echo "▶ Asegurando permisos de Laravel"
             sudo chown -R www-data:www-data storage bootstrap/cache
             sudo chmod -R 775 storage bootstrap/cache
+            sudo usermod -aG www-data $USER
 
             echo "▶ Limpiando caché"
             php artisan optimize:clear
