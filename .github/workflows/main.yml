@@ -52,6 +52,7 @@ jobs:
               echo "▶ Asegurando permisos de Laravel"
               sudo chmod -R 777 /home/api-ecommerce.juandevops.com/public_html/storage/logs/laravel.log
               sudo chmod -R 777 /home/api-ecommerce.juandevops.com/public_html/storage/framework/cache/data
+              sudo chmod -R 777 /home/api-ecommerce.juandevops.com/public_html/storage/framework/views
 
               echo "▶ Limpiando caché al final del deploy"
               php artisan optimize:clear
