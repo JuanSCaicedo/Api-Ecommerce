@@ -44,13 +44,20 @@ jobs:
               git pull origin main
 
               echo "▶ Actualizar dependencias"
-              composer update 
+              composer update \
+                --no-dev \
+                --optimize-autoloader \
+                --no-interaction
 
               echo "▶ Asegurando permisos de Laravel"
               sudo chmod -R 777 /home/api-ecommerce.juandevops.com/public_html/storage/logs/laravel.log
               sudo chmod -R 777 /home/api-ecommerce.juandevops.com/public_html/storage/framework/cache/data
 
-              echo "▶ Limpiando caché"
+              echo "▶ Limpiando caché al final del deploy"
               php artisan optimize:clear
+              php artisan cache:clear
+              php artisan config:clear
+              php artisan route:clear
+              php artisan view:clear
 
               echo "✅ Deploy finalizado correctamente"
