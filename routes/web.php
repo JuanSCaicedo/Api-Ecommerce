@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
 /*
@@ -16,6 +18,40 @@ use Illuminate\Support\Facades\Storage;
 // Route::get('/', function () {
 //     return view('welcome');
 // });
+
+Route::get('/login', function () {
+	if (Auth::check()) {
+		return redirect('/telescope');
+	}
+
+	return response()->view('auth.telescope-login');
+})->name('login');
+
+Route::post('/login', function (Request $request) {
+	$credentials = $request->validate([
+		'email' => ['required', 'email'],
+		'password' => ['required', 'string'],
+	]);
+
+	if (! Auth::attempt(array_merge($credentials, ['type_user' => 1]), $request->boolean('remember'))) {
+		return back()->withErrors([
+			'email' => 'Las credenciales no son válidas para acceso web.',
+		])->onlyInput('email');
+	}
+
+	$request->session()->regenerate();
+
+	return redirect('/telescope');
+})->name('telescope.login');
+
+Route::post('/logout', function (Request $request) {
+	Auth::logout();
+
+	$request->session()->invalidate();
+	$request->session()->regenerateToken();
+
+	return redirect()->route('login');
+})->name('telescope.logout');
 
 // Ruta de prueba para verificar la integración con OCI
 // Route::get('/test-oci', function () {
