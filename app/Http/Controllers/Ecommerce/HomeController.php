@@ -419,7 +419,9 @@ class HomeController extends Controller
 
     public function filter_advance_product(Request $request)
     {
-        $products = Product::orderBy("id", "desc")->where("state", 2)->paginate(15);
+        $categories_selected = $request->categories_selected;
+
+        $products = Product::filterAdvanceEcommerce($categories_selected)->orderBy("id", "desc")->where("state", 2)->paginate(15);
 
         return response()->json([
             "total" => $products->total(),
