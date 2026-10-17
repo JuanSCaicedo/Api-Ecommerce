@@ -389,7 +389,10 @@ class HomeController extends Controller
             ->where("state", 1)
             ->get();
 
-        $colors = Propertie::where("code", "<>", null)
+        $colors = Propertie::whereNotNull("code")
+            ->whereHas("attribute", function ($query) {
+                $query->where("state", 1);
+            })
             ->get();
 
         $product_relateds = Product::where("state", 2)->inRandomOrder()->limit(4)->get();
@@ -409,7 +412,13 @@ class HomeController extends Controller
             ]),
 
             "colors" => $colors->map(function ($color) {
-                $color->products_count = $color->attribute->variations->unique("product_id")->count();
+                $color->products_count = $color->variations()
+                    ->whereHas("product", fn($query) => $query->where("state", 2))
+                    ->whereHas("attribute", function ($query) {
+                        $query->where("state", 1);
+                    })
+                    ->distinct("product_id")
+                    ->count("product_id");
                 return $color;
             }),
 
@@ -420,8 +429,19 @@ class HomeController extends Controller
     public function filter_advance_product(Request $request)
     {
         $categories_selected = $request->categories_selected;
+        $colors_selected = $request->colors_selected;
+        $colors_product_selected = [];
 
-        $products = Product::filterAdvanceEcommerce($categories_selected)->orderBy("id", "desc")->where("state", 2)->paginate(15);
+        if ($colors_selected && sizeof($colors_selected) > 0) {
+            $properties = Propertie::whereIn("id", $colors_selected)->get();
+            foreach ($properties as $propertie) {
+                foreach ($propertie->variations as $variation) {
+                    array_push($colors_product_selected, $variation->product_id);
+                }
+            }
+        }
+
+        $products = Product::filterAdvanceEcommerce($categories_selected, $colors_product_selected)->orderBy("id", "desc")->where("state", 2)->paginate(15);
 
         return response()->json([
             "total" => $products->total(),
