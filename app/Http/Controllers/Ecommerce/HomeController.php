@@ -431,6 +431,9 @@ class HomeController extends Controller
         $categories_selected = $request->categories_selected;
         $colors_selected = $request->colors_selected;
         $brands_selected = $request->brands_selected;
+        $min_price = $request->min_price;
+        $max_price = $request->max_price;
+        $currency = $request->currency;
         $colors_product_selected = [];
 
         if ($colors_selected && sizeof($colors_selected) > 0) {
@@ -442,7 +445,7 @@ class HomeController extends Controller
             }
         }
 
-        $products = Product::filterAdvanceEcommerce($categories_selected, $colors_product_selected, $brands_selected)->orderBy("id", "desc")->where("state", 2)->paginate(15);
+        $products = Product::filterAdvanceEcommerce($categories_selected, $colors_product_selected, $brands_selected, $min_price, $max_price, $currency)->orderBy("id", "desc")->where("state", 2)->paginate(15);
 
         return response()->json([
             "total" => $products->total(),
