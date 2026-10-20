@@ -195,10 +195,14 @@ class Product extends Model
         return $query;
     }
 
-    public function scopefilterAdvanceEcommerce($query, $categories_selected, $colors_product_selected, $brands_selected, $min_price, $max_price, $currency)
+    public function scopefilterAdvanceEcommerce($query, $categories_selected, $colors_product_selected, $brands_selected, $min_price, $max_price, $currency, $product_general_ids_array)
     {
         if ($categories_selected && sizeof($categories_selected) > 0) {
             $query->whereIn("categorie_first_id", $categories_selected);
+        }
+
+        if ($product_general_ids_array && sizeof($product_general_ids_array) > 0) {
+            $query->whereIn("id", $product_general_ids_array);
         }
 
         if ($colors_product_selected && sizeof($colors_product_selected) > 0) {

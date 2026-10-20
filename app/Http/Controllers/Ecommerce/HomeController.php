@@ -434,6 +434,7 @@ class HomeController extends Controller
         $min_price = $request->min_price;
         $max_price = $request->max_price;
         $currency = $request->currency;
+        $options_aditional = $request->options_aditional;
         $colors_product_selected = [];
 
         if ($colors_selected && sizeof($colors_selected) > 0) {
@@ -445,7 +446,27 @@ class HomeController extends Controller
             }
         }
 
-        $products = Product::filterAdvanceEcommerce($categories_selected, $colors_product_selected, $brands_selected, $min_price, $max_price, $currency)->orderBy("id", "desc")->where("state", 2)->paginate(15);
+        $product_general_ids_array = [];
+        if ($options_aditional && sizeof($options_aditional) > 0 && in_array("campaing", $options_aditional)) {
+            date_default_timezone_set("America/Bogota");
+            $discount = Discount::where("type_campaing", 1)->where("state", 1)
+                ->where("start_date", "<=", today())
+                ->where("end_date", ">=", today())
+                ->first();
+            if ($discount) {
+                foreach ($discount->products as $product_aux) {
+                    array_push($product_general_ids_array, $product_aux->product_id);
+                }
+                foreach ($discount->categories as $categorie_aux) {
+                    array_push($categories_selected, $categorie_aux->categorie_id);
+                }
+                foreach ($discount->brands as $brand_aux) {
+                    array_push($brands_selected, $brand_aux->brand_id);
+                }
+            }
+        }
+
+        $products = Product::filterAdvanceEcommerce($categories_selected, $colors_product_selected, $brands_selected, $min_price, $max_price, $currency, $product_general_ids_array)->orderBy("id", "desc")->where("state", 2)->paginate(15);
 
         return response()->json([
             "total" => $products->total(),
