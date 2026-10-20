@@ -195,7 +195,7 @@ class Product extends Model
         return $query;
     }
 
-    public function scopefilterAdvanceEcommerce($query, $categories_selected, $colors_product_selected, $brands_selected, $min_price, $max_price, $currency, $product_general_ids_array, $options_aditional)
+    public function scopefilterAdvanceEcommerce($query, $categories_selected, $colors_product_selected, $brands_selected, $min_price, $max_price, $currency, $product_general_ids_array, $options_aditional, $search)
     {
         if ($categories_selected && sizeof($categories_selected) > 0) {
             $query->whereIn("categorie_first_id", $categories_selected);
@@ -236,6 +236,10 @@ class Product extends Model
             } else {
                 $query->whereBetween("price_cop", [$min_price, $max_price]);
             }
+        }
+
+        if ($search) {
+            $query->where("title", "like", "%" . $search . "%");
         }
 
         return $query;
